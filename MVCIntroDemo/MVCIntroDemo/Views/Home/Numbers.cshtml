@@ -1,0 +1,12 @@
+﻿@{
+    ViewBag.Title = "Numbers Page";
+}
+
+<h2>@ViewBag.Title</h2>
+<h3>@ViewBag.Message</h3>
+<ul>
+    @for(int i = 1; i <= 10; i++)
+    {
+        <li>@i</li>
+    }
+</ul>
