@@ -1,16 +1,24 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CinemaWebApp.Models; //Include the Movie model
-using System.Collections.Generic; //For handling lists
+using System.Collections.Generic;
+using CinemaWebApp.Models.Data; //For handling lists
 
 namespace CinemaWebApp.Controllers
 {
     public class MovieController : Controller
     {
-        private static List<Movie> movies = new List<Movie>();
+        private readonly AppDbContext _context;
+
+        //Inject the AppDbContext using constructor dependency injection
+        public MovieController(AppDbContext context)
+        {
+            _context = context;
+        }
 
         public IActionResult Index()
         {
-            return View(movies); //Pass the list of movies to the view
+            var movies = _context.Movies.ToList(); // Retrieve all movies from the database
+            return View(movies);
         }
 
         [HttpGet]
@@ -19,30 +27,28 @@ namespace CinemaWebApp.Controllers
             return View();
         }
 
-        //POST: Action to handle form submission for creating a new movie
         [HttpPost]
         public IActionResult Create(Movie movie)
         {
-            //Assign a unique id to the movie
-            movie.Id = movies.Count + 1;
-
-            //Add the movie to the list
-            movies.Add(movie);
-
-            //Redirect to the Index action
-            return RedirectToAction("Index");
+            if(ModelState.IsValid)
+            {
+                _context.Movies.Add(movie); // Add the movie to the database
+                _context.SaveChanges(); // Save changes to the database
+                return RedirectToAction("Index"); // Redirect to the Index action
+            }
+            return View(movie); // Return the view with the movie model
         }
 
         public IActionResult Details(int id)
         {
-            Movie movie = movies.Find(m => m.Id == id);
+            var movie = _context.Movies.Find(id); // Find the movie by id
 
-            if (movie == null)
+            if(movie == null)
             {
-                return NotFound();
+                return NotFound(); // Return 404 Not Found
             }
 
             return View(movie);
-        }
+        }   
     }
 }
