@@ -1,7 +1,8 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using CinemaWebApp.Models; //Include the Movie model
 using System.Collections.Generic;
-using CinemaWebApp.Models.Data; //For handling lists
+using CinemaWebApp.Models.Data;
+using CinemaWebApp.ViewModels; //For handling lists
 
 namespace CinemaWebApp.Controllers
 {
@@ -24,19 +25,33 @@ namespace CinemaWebApp.Controllers
         [HttpGet]
         public IActionResult Create()
         {
-            return View();
+            return View(new MovieViewModel());
         }
 
         [HttpPost]
-        public IActionResult Create(Movie movie)
+        public IActionResult Create(MovieViewModel viewModel)
         {
-            if(ModelState.IsValid)
+            //Validate the input data using ModelState
+            if (ModelState.IsValid)
             {
-                _context.Movies.Add(movie); // Add the movie to the database
-                _context.SaveChanges(); // Save changes to the database
-                return RedirectToAction("Index"); // Redirect to the Index action
+                //Map the view model to the Movie entity
+                var movie = new Movie
+                {
+                    Title = viewModel.Title,
+                    Genre = viewModel.Genre,
+                    ReleaseDate = viewModel.ReleaseDate,
+                    Director = viewModel.Director,
+                    Duration = viewModel.Duration,
+                    Description = viewModel.Description
+                };
+
+                _context.Movies.Add(movie);
+                _context.SaveChanges();
+
+                return RedirectToAction("Index");
             }
-            return View(movie); // Return the view with the movie model
+
+            return View(viewModel);
         }
 
         public IActionResult Details(int id)
