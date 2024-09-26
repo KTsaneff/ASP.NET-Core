@@ -15,5 +15,8 @@
         public int Duration { get; set; }
 
         public string Description { get; set; } = null!;
+
+        //Navigation property for many-to-many relationship with Cinema
+        public ICollection<CinemaMovie> CinemaMovies { get; set; } = new List<CinemaMovie>();
     }
 }
