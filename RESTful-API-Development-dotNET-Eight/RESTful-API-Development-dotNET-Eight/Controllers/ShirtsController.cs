@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RESTful_API_Development_dotNET_Eight.Models;
 
 namespace RESTful_API_Development_dotNET_Eight.Controllers
 {
@@ -19,7 +20,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
         }
 
         [HttpPost]
-        public string CreateShirt()
+        public string CreateShirt([FromForm]Shirt shirt)
         {
             return "Controller Routing: Creating a new shirt...";
         }
