@@ -1,17 +1,24 @@
-﻿namespace RESTful_API_Development_dotNET_Eight.Models
+﻿using RESTful_API_Development_dotNET_Eight.Models.Validations;
+using System.ComponentModel.DataAnnotations;
+
+namespace RESTful_API_Development_dotNET_Eight.Models
 {
     public class Shirt
     {
         public int ShirtId { get; set; }
 
-        public string? Brand { get; set; }
+        [Required]
+        public string Brand { get; set; } = null!;
 
-        public string? Color { get; set; }
+        [Required]
+        public string Color { get; set; } = null!;
 
-        public int Size { get; set; }
+        [Shirt_EnsureCorrectSizing]
+        public int? Size { get; set; }
 
-        public string? Gender { get; set; }
+        [Required]
+        public string Gender { get; set; } = null!;
 
-        public double Price { get; set; }
+        public double? Price { get; set; }
     }
 }

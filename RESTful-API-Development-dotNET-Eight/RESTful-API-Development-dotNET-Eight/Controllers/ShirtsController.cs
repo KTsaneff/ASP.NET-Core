@@ -13,14 +13,14 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
             return "Controller Routing: Reading all the shirts...";
         }
 
-        [HttpGet("{id}")]
+        [HttpGet("{id}")]   
         public string GetShirtById(int id)
         {
             return $"Controller Routing: Reading shirt with ID: {id}";
         }
 
         [HttpPost]
-        public string CreateShirt([FromForm]Shirt shirt)
+        public string CreateShirt([FromBody]Shirt shirt)
         {
             return "Controller Routing: Creating a new shirt...";
         }
