@@ -1,4 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RESTful_API_Development_dotNET_Eight.Filters;
+using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters;
+using RESTful_API_Development_dotNET_Eight.Filters.ExceptionFilters;
 using RESTful_API_Development_dotNET_Eight.Models;
 using RESTful_API_Development_dotNET_Eight.Models.Repositories;
 
@@ -8,48 +11,51 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
     [Route("/api/[controller]")]
     public class ShirtsController : ControllerBase
     {
-        
+
 
         [HttpGet]
         public IActionResult GetShirts()
         {
-            return Ok("Controller Routing: Reading all the shirts...");
+            return Ok(ShirtRepository.GetShirts());
         }
 
-        [HttpGet("{id}")]   
+        [HttpGet("{id}")]
+        [Shirt_ValidateShirtIdFilter]
         public IActionResult GetShirtById(int id)
         {
-            if(id <= 0)
-            {
-                return BadRequest(/*"Invalid shirt ID."*/);
-            }
-
-            var shirt = ShirtRepository.GetShirtById(id);
-
-            if(shirt == null)
-            {
-                return NotFound();
-            }
-
-            return Ok(shirt);
+            return Ok(ShirtRepository.GetShirtById(id));
         }
 
         [HttpPost]
-        public IActionResult CreateShirt([FromBody]Shirt shirt)
+        [Shirt_ValidateCreateShirtFilter]
+        public IActionResult CreateShirt([FromBody] Shirt shirt)
         {
-            return Ok("Controller Routing: Creating a new shirt...");
+            ShirtRepository.AddShirt(shirt);
+
+            return CreatedAtAction(nameof(GetShirtById),
+                                   new { id = shirt.ShirtId },
+                                   shirt);
         }
 
         [HttpPut("{id}")]
-        public IActionResult UpdateShirt(int id)
+        [Shirt_ValidateShirtIdFilter]
+        [Shirt_UpdateShirtFilter]
+        [Shirt_HandleUpdateExceptionsFilter]
+        public IActionResult UpdateShirt(int id, Shirt shirt)
         {
-            return Ok($"Controller Routing: Updating shirt with ID: {id}");
+            ShirtRepository.UpdateShirt(shirt);
+
+            return NoContent();
         }
 
         [HttpDelete("{id}")]
+        [Shirt_ValidateShirtIdFilter]
         public IActionResult DeleteShirt(int id)
         {
-            return Ok($"Controller Routing: Deleting shirt with ID: {id}");
+            var shirt = ShirtRepository.GetShirtById(id);
+            ShirtRepository.DeleteShirt(id);
+
+            return Ok(shirt);
         }
     }
 }
