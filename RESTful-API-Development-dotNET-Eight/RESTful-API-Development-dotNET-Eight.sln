@@ -3,7 +3,9 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RESTful-API-Development-dotNET-Eight", "RESTful-API-Development-dotNET-Eight\RESTful-API-Development-dotNET-Eight.csproj", "{581C2479-D4E4-4E82-83A5-2939ED078BB9}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTful-API-Development-dotNET-Eight", "RESTful-API-Development-dotNET-Eight\RESTful-API-Development-dotNET-Eight.csproj", "{581C2479-D4E4-4E82-83A5-2939ED078BB9}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp-Development-dotNET-Eight", "WebApp-Development-dotNET-Eight\WebApp-Development-dotNET-Eight.csproj", "{6CC88731-303D-4EC6-8EF6-92FC5274B124}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -15,6 +17,10 @@ Global
 		{581C2479-D4E4-4E82-83A5-2939ED078BB9}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{581C2479-D4E4-4E82-83A5-2939ED078BB9}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{581C2479-D4E4-4E82-83A5-2939ED078BB9}.Release|Any CPU.Build.0 = Release|Any CPU
+		{6CC88731-303D-4EC6-8EF6-92FC5274B124}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{6CC88731-303D-4EC6-8EF6-92FC5274B124}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{6CC88731-303D-4EC6-8EF6-92FC5274B124}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{6CC88731-303D-4EC6-8EF6-92FC5274B124}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
