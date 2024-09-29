@@ -1,3 +1,5 @@
+using WebApp_Development_dotNET_Eight.Data;
+
 namespace WebApp_Development_dotNET_Eight
 {
     public class Program
@@ -7,7 +9,14 @@ namespace WebApp_Development_dotNET_Eight
             var builder = WebApplication.CreateBuilder(args);
 
             // Add services to the container.
+            builder.Services.AddHttpClient("Shirts.Api", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7112/api/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
             builder.Services.AddControllersWithViews();
+
+            builder.Services.AddTransient<IWebApiExecuter, WebApiExecuter>();
 
             var app = builder.Build();
 
