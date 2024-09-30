@@ -30,7 +30,7 @@ namespace WebApp_Development_dotNET_Eight.Controllers
             if (ModelState.IsValid)
             {
                 var response = await webApiExecutor.InvokePost("shirts", shirt);
-                if(response != null)
+                if (response != null)
                 {
                     return RedirectToAction(nameof(Index));
                 }
@@ -50,6 +50,23 @@ namespace WebApp_Development_dotNET_Eight.Controllers
             }
 
             return NotFound();
+        }
+        [HttpPost]
+        public async Task<IActionResult> Update(Shirt shirt)
+        {
+            if (ModelState.IsValid)
+            {
+                await webApiExecutor.InvokePut($"shirts/{shirt.ShirtId}", shirt);
+                return RedirectToAction(nameof(Index));
+            }
+            return View(shirt);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Delete(int shirtId)
+        {
+            await webApiExecutor.InvokeDelete($"shirts/{shirtId}");
+            return RedirectToAction(nameof(Index));
         }
     }
 }
