@@ -7,15 +7,15 @@ namespace WebApp_Development_dotNET_Eight.Controllers
 {
     public class ShirtsController : Controller
     {
-        private readonly IWebApiExecuter webApiExecuter;
+        private readonly IWebApiExecutor webApiExecutor;
 
-        public ShirtsController(IWebApiExecuter webApiExecuter)
+        public ShirtsController(IWebApiExecutor webApiExecuter)
         {
-            this.webApiExecuter = webApiExecuter;
+            this.webApiExecutor = webApiExecuter;
         }
         public async Task<IActionResult> Index()
         {
-            return View(await webApiExecuter.InvokeGet<List<Shirt>>("shirts"));
+            return View(await webApiExecutor.InvokeGet<List<Shirt>>("shirts"));
         }
 
         [HttpGet]
@@ -27,7 +27,29 @@ namespace WebApp_Development_dotNET_Eight.Controllers
         [HttpPost]
         public async Task<IActionResult> Create(Shirt shirt)
         {
+            if (ModelState.IsValid)
+            {
+                var response = await webApiExecutor.InvokePost("shirts", shirt);
+                if(response != null)
+                {
+                    return RedirectToAction(nameof(Index));
+                }
+            }
+
             return View(shirt);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Update(int shirtId)
+        {
+            var shirt = await webApiExecutor.InvokeGet<Shirt>($"shirts/{shirtId}");
+
+            if (shirt != null)
+            {
+                return View(shirt);
+            }
+
+            return NotFound();
         }
     }
 }

@@ -16,7 +16,7 @@ namespace WebApp_Development_dotNET_Eight
             });
             builder.Services.AddControllersWithViews();
 
-            builder.Services.AddTransient<IWebApiExecuter, WebApiExecuter>();
+            builder.Services.AddTransient<IWebApiExecutor, WebApiExecutor>();
 
             var app = builder.Build();
 

@@ -1,7 +1,7 @@
-﻿@model List<Shirt> 
+﻿@model List<Shirt>
 
-    <h3>Shirts</h3>
-    <br/>
+<h3>Shirts</h3>
+<br />
 <table class="table table-striped">
     <thead>
         <tr>
@@ -10,19 +10,24 @@
             <td>Color</td>
             <td>Size</td>
             <td>Price</td>
+            <td></td>
         </tr>
     </thead>
     <tbody>
-        @foreach(var shirt in Model)
+        @foreach (var shirt in Model)
         {
             <tr>
                 <td>@shirt.Brand</td>
                 <td>@shirt.Gender</td>
                 <td>@shirt.Color</td>
                 <td>@shirt.Size</td>
-                <td>@(shirt.Price.HasValue?shirt.Price.Value.ToString("c"):"")</td>
+                <td>@(shirt.Price.HasValue ? shirt.Price.Value.ToString("c") : "")</td>
+                <td>
+                    <a class="btn btn-primary" asp-controller="shirts" asp-action="update" asp-route-shirtId="@shirt.ShirtId">Update</a>
+                    <a class="btn btn-danger" asp-controller="shirts" asp-action="delete" asp-route-shirtId="@shirt.ShirtId">Delete</a>
+                </td>
             </tr>
         }
     </tbody>
-    </table>
-    <a class="btn btn-primary" asp-controller="shirts" asp-action="create">Create</a>
+</table>
+<a class="btn btn-primary" asp-controller="shirts" asp-action="create">Create</a>

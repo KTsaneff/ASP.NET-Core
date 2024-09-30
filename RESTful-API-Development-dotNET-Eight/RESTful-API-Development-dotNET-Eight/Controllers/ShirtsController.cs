@@ -3,7 +3,6 @@ using RESTful_API_Development_dotNET_Eight.Data;
 using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters;
 using RESTful_API_Development_dotNET_Eight.Filters.ExceptionFilters;
 using RESTful_API_Development_dotNET_Eight.Models;
-using RESTful_API_Development_dotNET_Eight.Models.Repositories;
 
 namespace RESTful_API_Development_dotNET_Eight.Controllers
 {

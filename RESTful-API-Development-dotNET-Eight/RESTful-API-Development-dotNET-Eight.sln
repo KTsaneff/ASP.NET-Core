@@ -5,7 +5,7 @@ VisualStudioVersion = 17.10.35122.118
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "RESTful-API-Development-dotNET-Eight", "RESTful-API-Development-dotNET-Eight\RESTful-API-Development-dotNET-Eight.csproj", "{581C2479-D4E4-4E82-83A5-2939ED078BB9}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "WebApp-Development-dotNET-Eight", "WebApp-Development-dotNET-Eight\WebApp-Development-dotNET-Eight.csproj", "{6CC88731-303D-4EC6-8EF6-92FC5274B124}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "WebApp-Development-dotNET-Eight", "WebApp-Development-dotNET-Eight\WebApp-Development-dotNET-Eight.csproj", "{6CC88731-303D-4EC6-8EF6-92FC5274B124}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
