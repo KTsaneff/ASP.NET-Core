@@ -2,13 +2,14 @@
 using RESTful_API_Development_dotNET_Eight.Attributes;
 using RESTful_API_Development_dotNET_Eight.Data;
 using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters;
+using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters.V2;
 using RESTful_API_Development_dotNET_Eight.Filters.AuthFilters;
 using RESTful_API_Development_dotNET_Eight.Filters.ExceptionFilters;
 using RESTful_API_Development_dotNET_Eight.Models;
 
-namespace RESTful_API_Development_dotNET_Eight.Controllers
+namespace RESTful_API_Development_dotNET_Eight.Controllers.V2
 {
-    [ApiVersion("1.0")]
+    [ApiVersion("2.0")]
     [ApiController]
     [Route("/api/v{v:apiVersion}/[controller]")]
     [JwtTokenAuthFilter]
@@ -38,6 +39,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
 
         [HttpPost]
         [TypeFilter(typeof(Shirt_ValidateCreateShirtFilterAttribute))]
+        [Shirt_EnsureDescriptionIsPresentFilter]
         [RequiredClaim("write", "true")]
         public IActionResult CreateShirt([FromBody] Shirt shirt)
         {
@@ -53,6 +55,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         [Shirt_ValidateUpdateShirtFilter]
         [TypeFilter(typeof(Shirt_HandleUpdateExceptionsFilterAttribute))]
+        [Shirt_EnsureDescriptionIsPresentFilter]
         [RequiredClaim("write", "true")]
         public IActionResult UpdateShirt(int id, Shirt shirt)
         {
@@ -63,6 +66,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
             shirtToUpdate.Gender = shirt.Gender;
             shirtToUpdate.Price = shirt.Price;
             shirtToUpdate.Size = shirt.Size;
+            shirtToUpdate.Description = shirt.Description;
 
             this.db.SaveChanges();
 

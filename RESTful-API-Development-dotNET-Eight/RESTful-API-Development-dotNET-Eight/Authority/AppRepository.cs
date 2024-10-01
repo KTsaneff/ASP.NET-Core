@@ -12,9 +12,7 @@
                 Secret = "cdb5f030-1b63-4132-b77a-c5dfe2408554",
                 Scopes = "read,write,delete"
             }
-        };
-
-       
+        };       
 
         public static Application? GetApplicationByClientId(string clientId)
         {

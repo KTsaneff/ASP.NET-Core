@@ -4,7 +4,7 @@ using RESTful_API_Development_dotNET_Eight.Models;
 
 namespace RESTful_API_Development_dotNET_Eight.Filters.ActionFilters
 {
-    public class Shirt_UpdateShirtFilterAttribute : ActionFilterAttribute
+    public class Shirt_ValidateUpdateShirtFilterAttribute : ActionFilterAttribute
     {
         public override void OnActionExecuting(ActionExecutingContext context)
         {
