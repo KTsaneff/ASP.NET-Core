@@ -14,6 +14,22 @@ namespace WebApp_Development_dotNET_Eight
                 client.BaseAddress = new Uri("https://localhost:7112/api/");
                 client.DefaultRequestHeaders.Add("Accept", "application/json");
             });
+
+            builder.Services.AddHttpClient("Authority.Api", client =>
+            {
+                client.BaseAddress = new Uri("https://localhost:7112/");
+                client.DefaultRequestHeaders.Add("Accept", "application/json");
+            });
+
+            builder.Services.AddSession(options =>
+            {
+                options.Cookie.HttpOnly = true;
+                options.IdleTimeout = TimeSpan.FromHours(5);
+                options.Cookie.IsEssential = true;
+            });
+
+            builder.Services.AddHttpContextAccessor();
+
             builder.Services.AddControllersWithViews();
 
             builder.Services.AddTransient<IWebApiExecutor, WebApiExecutor>();
@@ -30,10 +46,9 @@ namespace WebApp_Development_dotNET_Eight
 
             app.UseHttpsRedirection();
             app.UseStaticFiles();
-
             app.UseRouting();
-
             app.UseAuthorization();
+            app.UseSession();
 
             app.MapControllerRoute(
                 name: "default",
