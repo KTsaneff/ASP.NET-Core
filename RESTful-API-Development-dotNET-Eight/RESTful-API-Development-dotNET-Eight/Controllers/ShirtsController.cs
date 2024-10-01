@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Mvc;
+using RESTful_API_Development_dotNET_Eight.Attributes;
 using RESTful_API_Development_dotNET_Eight.Data;
 using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters;
 using RESTful_API_Development_dotNET_Eight.Filters.AuthFilters;
@@ -20,12 +21,14 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
         }
 
         [HttpGet]
+        [RequiredClaim("read", "true")]
         public IActionResult GetShirts()
         {
             return Ok(db.Shirts.ToList());
         }
 
         [HttpGet("{id}")]
+        [RequiredClaim("read", "true")]
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         public IActionResult GetShirtById(int id)
         {
@@ -34,6 +37,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
 
         [HttpPost]
         [TypeFilter(typeof(Shirt_ValidateCreateShirtFilterAttribute))]
+        [RequiredClaim("write", "true")]
         public IActionResult CreateShirt([FromBody] Shirt shirt)
         {
             this.db.Shirts.Add(shirt);
@@ -48,6 +52,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
         [Shirt_UpdateShirtFilter]
         [TypeFilter(typeof(Shirt_HandleUpdateExceptionsFilterAttribute))]
+        [RequiredClaim("write", "true")]
         public IActionResult UpdateShirt(int id, Shirt shirt)
         {
             var shirtToUpdate = HttpContext.Items["shirt"] as Shirt;
@@ -65,6 +70,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
 
         [HttpDelete("{id}")]
         [TypeFilter(typeof(Shirt_ValidateShirtIdFilterAttribute))]
+        [RequiredClaim("delete", "true")]
         public IActionResult DeleteShirt(int id)
         {
             var shirtToDelete = HttpContext.Items["shirt"] as Shirt;

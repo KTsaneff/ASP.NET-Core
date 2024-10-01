@@ -1,6 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Primitives;
-using Microsoft.IdentityModel.Tokens;
+﻿using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -28,10 +26,17 @@ namespace RESTful_API_Development_dotNET_Eight.Authority
 
             var claims = new List<Claim>
             {
-                new Claim("AppName", application?.ApplicationName??string.Empty),
-                new Claim("Read", (application?.Scopes??string.Empty).Contains("read")?"true":"false"),
-                new Claim("Write", (application?.Scopes??string.Empty).Contains("write")?"true":"false"),
+                new Claim("AppName", application?.ApplicationName??string.Empty)                
             };
+
+            var scopes = application?.Scopes?.Split(",");
+            if(scopes != null && scopes.Length > 0)
+            {
+                foreach(var scope in scopes)
+                {
+                    claims.Add(new Claim(scope.ToLower(), "true"));
+                }
+            }
 
             var secretKey = Encoding.ASCII.GetBytes(strSecretKey);
 
@@ -47,12 +52,9 @@ namespace RESTful_API_Development_dotNET_Eight.Authority
             return new JwtSecurityTokenHandler().WriteToken(jwt);
         }
 
-        public static bool VerifyToken(string token, string strSecretKey)
+        public static IEnumerable<Claim?> VerifyToken(string token, string strSecretKey)
         {
-            if (string.IsNullOrWhiteSpace(token))
-            {
-                return false;
-            }
+            if (string.IsNullOrWhiteSpace(token)) return null;
 
             if(token.StartsWith("Bearer "))
             {
@@ -76,17 +78,25 @@ namespace RESTful_API_Development_dotNET_Eight.Authority
                     ClockSkew = TimeSpan.Zero
                 },
                 out securityToken);
+
+                if(securityToken != null)
+                {
+                    var tokenObject = tokenHandler.ReadJwtToken(token);
+                    return tokenObject.Claims ?? (new List<Claim>());
+                }
+                else
+                {
+                    return null;
+                }
             }
             catch(SecurityTokenException)
             {
-                return false;
+                return null;
             }
             catch
             {
                 throw;
             }    
-            
-            return securityToken != null;
         }
     }
 }
