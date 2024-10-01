@@ -1,6 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
 using RESTful_API_Development_dotNET_Eight.Data;
 using RESTful_API_Development_dotNET_Eight.Filters.ActionFilters;
+using RESTful_API_Development_dotNET_Eight.Filters.AuthFilters;
 using RESTful_API_Development_dotNET_Eight.Filters.ExceptionFilters;
 using RESTful_API_Development_dotNET_Eight.Models;
 
@@ -8,6 +9,7 @@ namespace RESTful_API_Development_dotNET_Eight.Controllers
 {
     [ApiController]
     [Route("/api/[controller]")]
+    [JwtTokenAuthFilter]
     public class ShirtsController : ControllerBase
     {
         private readonly ApplicationDbContext db;
