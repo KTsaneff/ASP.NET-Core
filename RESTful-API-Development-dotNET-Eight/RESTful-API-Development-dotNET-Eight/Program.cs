@@ -1,5 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.OpenApi.Models;
 using RESTful_API_Development_dotNET_Eight.Data;
+using RESTful_API_Development_dotNET_Eight.Filters.OprationFilters;
 
 namespace RESTful_API_Development_dotNET_Eight
 {
@@ -18,7 +20,17 @@ namespace RESTful_API_Development_dotNET_Eight
             builder.Services.AddControllers();
 
             builder.Services.AddEndpointsApiExplorer();
-            builder.Services.AddSwaggerGen();
+            builder.Services.AddSwaggerGen(c =>
+            {
+                c.OperationFilter<AuthorizationHeaderOperationFilter>();
+                c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
+                {
+                    Scheme = "Bearer",
+                    Type = SecuritySchemeType.Http,
+                    BearerFormat = "JWT",
+                    In = ParameterLocation.Header
+                });
+            });
 
             var app = builder.Build();
 
