@@ -6,6 +6,7 @@
         Adventure,
         Animation,
         Biography,
+        Cartoon,
         Comedy,
         Crime,
         Drama,
