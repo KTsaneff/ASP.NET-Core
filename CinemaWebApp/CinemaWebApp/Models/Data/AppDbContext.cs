@@ -18,25 +18,40 @@ namespace CinemaWebApp.Models.Data
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<CinemaMovie> CinemasMovies { get; set; }
 
+        public DbSet<UserMovie> UsersMovies { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
-            base.OnModelCreating(modelBuilder); //Make sure to call the base class method
+            base.OnModelCreating(modelBuilder);
 
-            //Configure the composite key for the CinemaMovie entity
             modelBuilder.Entity<CinemaMovie>()
                 .HasKey(cm => new { cm.CinemaId, cm.MovieId });
 
-            //Configure the relationship between Cinema and CinemaMovie
             modelBuilder.Entity<CinemaMovie>()
-                .HasOne(cm => cm.Cinema)            //A CinemaMovie entity has one Cinema...
-                .WithMany(c => c.CinemaMovies)      //A Cinema entity can have many CinemaMovies
-                .HasForeignKey(cm => cm.CinemaId);  //CinemaId is the foreign key in CinemaMovie
+                .HasOne(cm => cm.Cinema)            
+                .WithMany(c => c.CinemaMovies)
+                .HasForeignKey(cm => cm.CinemaId);
 
-            //Configure the relationship between Movie and CinemaMovie
             modelBuilder.Entity<CinemaMovie>()
-                .HasOne(cm => cm.Movie)             //A CinemaMovie entity has one Movie...
-                .WithMany(m => m.CinemaMovies)      //A Movie entity can have many CinemaMovies
-                .HasForeignKey(cm => cm.MovieId);   //MovieId is the foreign key in CinemaMovie
+                .HasOne(cm => cm.Movie)          
+                .WithMany(m => m.CinemaMovies)   
+                .HasForeignKey(cm => cm.MovieId);
+
+            // Define the composite key for the UserMovie entity
+            modelBuilder.Entity<UserMovie>()
+                .HasKey(um => new { um.UserId, um.MovieId });
+
+            //Configure the relationship between the UserMovie and IdentityUser entities
+            modelBuilder.Entity<UserMovie>()
+                .HasOne(um => um.User)
+                .WithMany()
+                .HasForeignKey(um => um.UserId);
+
+            //Configure the relationship between the UserMovie and Movie entities
+            modelBuilder.Entity<UserMovie>()
+                .HasOne(um => um.Movie)
+                .WithMany()
+                .HasForeignKey(um => um.MovieId);
         }
     }
 }

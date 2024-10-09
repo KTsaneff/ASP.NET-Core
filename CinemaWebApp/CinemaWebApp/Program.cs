@@ -15,9 +15,15 @@ namespace CinemaWebApp
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
-            //Add Identity services
-            builder.Services.AddDefaultIdentity<IdentityUser>()
-                            .AddEntityFrameworkStores<AppDbContext>();
+            builder.Services.AddDefaultIdentity<IdentityUser>(options =>
+            {
+                options.Password.RequireDigit = false;
+                options.Password.RequireLowercase = false;
+                options.Password.RequireNonAlphanumeric = false;
+                options.Password.RequireUppercase = false;
+                options.Password.RequiredLength = 6;
+                options.SignIn.RequireConfirmedAccount = false;
+            }).AddEntityFrameworkStores<AppDbContext>();
 
             builder.Services.AddControllersWithViews();
 
@@ -34,7 +40,6 @@ namespace CinemaWebApp
 
             app.UseRouting();
 
-            //Add Authorization and Authentication middleware
             app.UseAuthentication();
             app.UseAuthorization();
 
@@ -42,7 +47,6 @@ namespace CinemaWebApp
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
 
-            //Enable Identity's Razor Pages for login, register, etc.
             app.MapRazorPages();
 
             app.Run();
