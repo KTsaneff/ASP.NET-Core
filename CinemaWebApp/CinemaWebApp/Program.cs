@@ -1,4 +1,5 @@
 using CinemaWebApp.Models.Data;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 
 namespace CinemaWebApp
@@ -9,22 +10,22 @@ namespace CinemaWebApp
         {
             var builder = WebApplication.CreateBuilder(args);
 
-            // Add services to the container.
-            builder.Services.AddControllersWithViews();
-
-            //Configure the DbContext with SQL Server
             builder.Services.AddDbContext<AppDbContext>(options =>
             {
                 options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
             });
 
+            //Add Identity services
+            builder.Services.AddDefaultIdentity<IdentityUser>()
+                            .AddEntityFrameworkStores<AppDbContext>();
+
+            builder.Services.AddControllersWithViews();
+
             var app = builder.Build();
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
-                // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
                 app.UseHsts();
             }
 
@@ -33,11 +34,16 @@ namespace CinemaWebApp
 
             app.UseRouting();
 
+            //Add Authorization and Authentication middleware
+            app.UseAuthentication();
             app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
+
+            //Enable Identity's Razor Pages for login, register, etc.
+            app.MapRazorPages();
 
             app.Run();
         }
