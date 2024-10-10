@@ -1,7 +1,7 @@
-﻿@model IEnumerable<Actor>
+﻿@model IEnumerable<Producer>
 
 @{
-    ViewBag.Title = "List of Actors";
+    ViewBag.Title = "List of Producers";
 }
 
 <div class="row">
@@ -16,17 +16,17 @@
                 </tr>
             </thead>
             <tbody>
-                @foreach(var actor in Model) 
+                @foreach(var producer in Model) 
                 {
                     <tr>
                         <td class="allign-middle">
-                            <img class="rounded-circle" src="@actor.ProfilePictureURL" alt="@actor.FullName" style="max-width: 150px"/>
+                            <img class="rounded-circle" src="@producer.ProfilePictureURL" alt="@producer.FullName" style="max-width: 150px" />
                         </td>
                         <td class="allign-middle">
-                            @Html.DisplayFor(modelItem => actor.FullName)
+                            @Html.DisplayFor(modelItem => producer.FullName)
                         </td>
                         <td class="allign-middle">
-                            @Html.DisplayFor(modelItem => actor.Bio)
+                            @Html.DisplayFor(modelItem => producer.Bio)
                         </td>
                         <td class="allign-middle">
                             <a class="btn btn-primary"><i class="bi bi-pencil-square"></i>Edit</a> | 
