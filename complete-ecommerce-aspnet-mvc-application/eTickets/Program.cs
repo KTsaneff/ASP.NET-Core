@@ -1,4 +1,5 @@
 using eTickets.Data;
+using eTickets.Data.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace eTickets
@@ -15,6 +16,9 @@ namespace eTickets
             });
 
             // Add services to the container.
+
+            builder.Services.AddScoped<IActorsService, ActorsService>();
+
             builder.Services.AddControllersWithViews();
 
             var app = builder.Build();
