@@ -14,6 +14,9 @@
                 <form asp-action="Create">
                     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
                 </form>
+                <di class="form-group text-center>
+                    <img id="ProfilePicturePreview/>
+                </di>
                 <div class="form-group">
                     <label asp-for="ProfilePictureURL" class="control-label"></label>
                     <input asp-for="ProfilePictureURL" class="form-control" />
@@ -37,3 +40,13 @@
         </div>
     </div>
 </div>
+
+@section Scripts {
+    <partial name="_ValidationScriptsPartial" />
+    <script>
+        $("#ProfilePictureURL").on("change", function () {
+            var output = document.getElementById("ProfilePicturePreview");
+            output.src = $(this).val();
+        });
+    </script>
+}
