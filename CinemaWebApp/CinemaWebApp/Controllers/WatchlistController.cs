@@ -24,7 +24,6 @@ namespace CinemaWebApp.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            //fetch all movies in the watchlist
             var watchListMovies = await _context.UsersMovies
                 .Where(um => um.UserId == userId)
                 .Include(um => um.Movie)
@@ -38,7 +37,6 @@ namespace CinemaWebApp.Controllers
                 })
                 .ToListAsync();
 
-            //pass the list of movies to the view
             return View(watchListMovies);
         }
 
@@ -47,13 +45,11 @@ namespace CinemaWebApp.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            //check if the movie is already in the watchlist
             var userMovie = await _context.UsersMovies
                 .FirstOrDefaultAsync(um => um.UserId == userId && um.MovieId == movieId);
 
             if (userMovie == null)
             {
-                //add the movie to the watchlist
                 userMovie = new UserMovie
                 {
                     UserId = userId,
@@ -72,13 +68,11 @@ namespace CinemaWebApp.Controllers
         {
             var userId = _userManager.GetUserId(User);
 
-            //find the movie in the watchlist
             var userMovie = await _context.UsersMovies
                 .FirstOrDefaultAsync(um => um.UserId == userId && um.MovieId == movieId);
 
             if (userMovie != null)
             {
-                //remove the movie from the watchlist
                 _context.UsersMovies.Remove(userMovie);
                 await _context.SaveChangesAsync();
             }
