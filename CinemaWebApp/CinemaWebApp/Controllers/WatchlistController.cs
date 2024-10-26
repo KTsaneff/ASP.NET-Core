@@ -1,4 +1,5 @@
-﻿using CinemaWebApp.Models;
+﻿using CinemaWebApp.Data.Models;
+using CinemaWebApp.Models;
 using CinemaWebApp.Models.Data;
 using CinemaWebApp.ViewModels;
 using Microsoft.AspNetCore.Authorization;
@@ -12,9 +13,9 @@ namespace CinemaWebApp.Controllers
     public class WatchlistController : Controller
     {
         private readonly AppDbContext _context;
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
 
-        public WatchlistController(AppDbContext context, UserManager<IdentityUser> userManager)
+        public WatchlistController(AppDbContext context, UserManager<ApplicationUser> userManager)
         {
             _context = context;
             _userManager = userManager;

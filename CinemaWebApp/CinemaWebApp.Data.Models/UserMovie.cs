@@ -1,13 +1,13 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CinemaWebApp.Data.Models;
 
 namespace CinemaWebApp.Models
 {
     public class UserMovie
     {
-        public string UserId { get; set; } = null!;  // Links to the user who added the movie
-        public IdentityUser User { get; set; } = null!;
+        public string UserId { get; set; } = null!;
+        public ApplicationUser User { get; set; } = null!;
 
-        public int MovieId { get; set; }  // Links to the movie the user wants to watch
+        public int MovieId { get; set; }
         public Movie Movie { get; set; } = null!;
     }
 }

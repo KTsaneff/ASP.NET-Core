@@ -1,10 +1,12 @@
-﻿using Microsoft.AspNetCore.Identity;
+﻿using CinemaWebApp.Data.Models;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
+using System.Reflection;
 
 namespace CinemaWebApp.Models.Data
 {
-    public class AppDbContext : IdentityDbContext<IdentityUser>
+    public class AppDbContext : IdentityDbContext<ApplicationUser>
     {
         public AppDbContext()
         {
@@ -17,12 +19,13 @@ namespace CinemaWebApp.Models.Data
         public DbSet<Movie> Movies { get; set; }
         public DbSet<Cinema> Cinemas { get; set; }
         public DbSet<CinemaMovie> CinemasMovies { get; set; }
-
         public DbSet<UserMovie> UsersMovies { get; set; }
+        public DbSet<Ticket> Tickets { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
+            modelBuilder.ApplyConfigurationsFromAssembly(Assembly.GetExecutingAssembly());
 
             modelBuilder.Entity<CinemaMovie>()
                 .HasKey(cm => new { cm.CinemaId, cm.MovieId });
@@ -37,21 +40,40 @@ namespace CinemaWebApp.Models.Data
                 .WithMany(m => m.CinemaMovies)   
                 .HasForeignKey(cm => cm.MovieId);
 
-            // Define the composite key for the UserMovie entity
             modelBuilder.Entity<UserMovie>()
                 .HasKey(um => new { um.UserId, um.MovieId });
 
-            //Configure the relationship between the UserMovie and IdentityUser entities
             modelBuilder.Entity<UserMovie>()
                 .HasOne(um => um.User)
                 .WithMany()
                 .HasForeignKey(um => um.UserId);
 
-            //Configure the relationship between the UserMovie and Movie entities
             modelBuilder.Entity<UserMovie>()
                 .HasOne(um => um.Movie)
                 .WithMany()
                 .HasForeignKey(um => um.MovieId);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Cinema)
+                .WithMany(c => c.Tickets)
+                .HasForeignKey(t => t.CinemaId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.Movie)
+                .WithMany(m => m.Tickets)
+                .HasForeignKey(t => t.MovieId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Ticket>()
+                .HasOne(t => t.User)
+                .WithMany()
+                .HasForeignKey(t => t.UserId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Ticket>()
+                .Property(t => t.Price)
+                .HasColumnType("decimal(18,2)");
         }
     }
 }

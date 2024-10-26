@@ -10,7 +10,6 @@ namespace CinemaWebApp.Controllers
     {
         private readonly AppDbContext _context;
 
-        //Inject the AppDbContext using constructor dependency injection
         public MovieController(AppDbContext context)
         {
             _context = context;
@@ -18,7 +17,7 @@ namespace CinemaWebApp.Controllers
 
         public IActionResult Index()
         {
-            var movies = _context.Movies.ToList(); // Retrieve all movies from the database
+            var movies = _context.Movies.ToList();
             return View(movies);
         }
 

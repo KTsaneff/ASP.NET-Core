@@ -24,7 +24,7 @@
                     <a asp-action="Details" asp-route-id="@movie.Id" class="btn btn-info">Details</a>
                     <a asp-action="AddToProgram" asp-route-movieId="@movie.Id" class="btn btn-primary">+Program</a>
 
-                    @if (User?.Identity?.IsAuthenticated ?? false) // show only if user is logged in
+                    @if (User?.Identity?.IsAuthenticated ?? false)
                     {
                         <form asp-controller="Watchlist" asp-action="AddToWatchlist" method="post" class="d-inline">
                             <input type="hidden" name="movieId" value="@movie.Id" />

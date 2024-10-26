@@ -13,6 +13,8 @@ namespace CinemaWebApp.Models
         [Required]
         public string Location { get; set; } = null!;
 
-        public ICollection<CinemaMovie> CinemaMovies { get; set; } = new List<CinemaMovie>();
+        public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+
+        public virtual ICollection<CinemaMovie> CinemaMovies { get; set; } = new List<CinemaMovie>();
     }
 }
