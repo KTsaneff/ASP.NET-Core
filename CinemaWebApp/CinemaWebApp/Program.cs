@@ -1,11 +1,10 @@
 using CinemaWebApp.Data.Models;
-using CinemaWebApp.Infrastructure.Repositories.Contracts;
 using CinemaWebApp.Infrastructure.Repositories;
+using CinemaWebApp.Infrastructure.Repositories.Contracts;
 using CinemaWebApp.Models.Data;
-using Microsoft.EntityFrameworkCore;
-using CinemaWebApp.ViewModels.Error;
-using System.Reflection;
 using CinemaWebApp.Services.Mapping;
+using CinemaWebApp.ViewModels.Error;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaWebApp
 {
@@ -41,7 +40,7 @@ namespace CinemaWebApp
 
             var app = builder.Build();
 
-            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
+            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).Assembly);
 
             if (!app.Environment.IsDevelopment())
             {
