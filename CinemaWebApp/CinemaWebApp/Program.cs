@@ -3,6 +3,9 @@ using CinemaWebApp.Infrastructure.Repositories.Contracts;
 using CinemaWebApp.Infrastructure.Repositories;
 using CinemaWebApp.Models.Data;
 using Microsoft.EntityFrameworkCore;
+using CinemaWebApp.ViewModels.Error;
+using System.Reflection;
+using CinemaWebApp.Services.Mapping;
 
 namespace CinemaWebApp
 {
@@ -37,6 +40,8 @@ namespace CinemaWebApp
             // Repeat for other specific repositories (e.g., ICinemaRepository, ITicketRepository)
 
             var app = builder.Build();
+
+            AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).GetTypeInfo().Assembly);
 
             if (!app.Environment.IsDevelopment())
             {

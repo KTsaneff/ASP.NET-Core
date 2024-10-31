@@ -1,6 +1,6 @@
 ﻿namespace CinemaWebApp.Services.Mapping
 {
-    public interface IMapto<T> where T : class
+    public interface IMapTo<T> where T : class
     {
     }
 }
