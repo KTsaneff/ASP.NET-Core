@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace CinemaWebApp.Data.Migrations
 {
     /// <inheritdoc />
-    public partial class Master_Architecture_Rearrangement : Migration
+    public partial class Init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -58,7 +58,8 @@ namespace CinemaWebApp.Data.Migrations
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    Location = table.Column<string>(type: "nvarchar(85)", maxLength: 85, nullable: false)
+                    Location = table.Column<string>(type: "nvarchar(85)", maxLength: 85, nullable: false),
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -129,8 +130,8 @@ namespace CinemaWebApp.Data.Migrations
                 name: "AspNetUserLogins",
                 columns: table => new
                 {
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    ProviderKey = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    ProviderKey = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     ProviderDisplayName = table.Column<string>(type: "nvarchar(max)", nullable: true),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
                 },
@@ -174,8 +175,8 @@ namespace CinemaWebApp.Data.Migrations
                 columns: table => new
                 {
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    LoginProvider = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
-                    Name = table.Column<string>(type: "nvarchar(128)", maxLength: 128, nullable: false),
+                    LoginProvider = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     Value = table.Column<string>(type: "nvarchar(max)", nullable: true)
                 },
                 constraints: table =>
@@ -195,7 +196,7 @@ namespace CinemaWebApp.Data.Migrations
                 {
                     CinemaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    IsDeleted = table.Column<bool>(type: "bit", nullable: false, defaultValue: false)
+                    IsDeleted = table.Column<bool>(type: "bit", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -205,7 +206,7 @@ namespace CinemaWebApp.Data.Migrations
                         column: x => x.CinemaId,
                         principalTable: "Cinemas",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Restrict);
+                        onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
                         name: "FK_CinemasMovies_Movies_MovieId",
                         column: x => x.MovieId,
@@ -219,7 +220,7 @@ namespace CinemaWebApp.Data.Migrations
                 columns: table => new
                 {
                     Id = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
-                    Price = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
+                    Price = table.Column<decimal>(type: "decimal(18,2)", precision: 18, scale: 2, nullable: false),
                     CinemaId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     MovieId = table.Column<Guid>(type: "uniqueidentifier", nullable: false),
                     UserId = table.Column<Guid>(type: "uniqueidentifier", nullable: false)
@@ -273,12 +274,12 @@ namespace CinemaWebApp.Data.Migrations
 
             migrationBuilder.InsertData(
                 table: "Cinemas",
-                columns: new[] { "Id", "Location", "Name" },
+                columns: new[] { "Id", "IsDeleted", "Location", "Name" },
                 values: new object[,]
                 {
-                    { new Guid("2dd9f6af-3519-4eba-9a78-2d473a2dbbd9"), "Sofia", "Cinema city" },
-                    { new Guid("44a76528-73b4-4b1e-b85b-b206cf78e0f8"), "Varna", "Cinemax" },
-                    { new Guid("79f96d3e-2d40-4dcf-9d7e-497c89039353"), "Plovdiv", "Cinema city" }
+                    { new Guid("796b7f3d-8910-4e22-bc7e-4b1939216e78"), false, "Plovdiv", "Cinema city" },
+                    { new Guid("86882b9b-66da-4f31-8e89-dd52863409b5"), false, "Sofia", "Cinema city" },
+                    { new Guid("c4da36c6-bb39-4107-8565-1a8236e82bf4"), false, "Varna", "Cinemax" }
                 });
 
             migrationBuilder.InsertData(
@@ -286,8 +287,8 @@ namespace CinemaWebApp.Data.Migrations
                 columns: new[] { "Id", "Description", "Director", "Duration", "Genre", "ReleaseDate", "Title" },
                 values: new object[,]
                 {
-                    { new Guid("0788070d-ed5c-415e-bcd3-802864b15ee5"), "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ", "Peter Jackson", 178, "Fantasy", new DateTime(2001, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Lord of the Rings" },
-                    { new Guid("93616c84-c95e-43ca-8d05-2b6f2ec1dd13"), "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.", "Mike Newel", 157, "Fantasy", new DateTime(2005, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Harry Potter and the Goblet of Fire" }
+                    { new Guid("34e57932-09a0-40ae-ae6f-331c8cd0be59"), "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.", "Mike Newel", 157, "Fantasy", new DateTime(2005, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Harry Potter and the Goblet of Fire" },
+                    { new Guid("3df0e234-cfcf-4f2c-adf2-c648f477d3c3"), "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ", "Peter Jackson", 178, "Fantasy", new DateTime(2001, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified), "Lord of the Rings" }
                 });
 
             migrationBuilder.CreateIndex(

@@ -4,6 +4,7 @@ using CinemaWebApp.Models.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaWebApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    partial class AppDbContextModelSnapshot : ModelSnapshot
+    [Migration("20241101083526_Init")]
+    partial class Init
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -129,21 +132,21 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("95045fcd-c01c-4253-b128-348a4e7386c2"),
+                            Id = new Guid("86882b9b-66da-4f31-8e89-dd52863409b5"),
                             IsDeleted = false,
                             Location = "Sofia",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("00603667-29d7-4f3a-a779-37e189ac4227"),
+                            Id = new Guid("796b7f3d-8910-4e22-bc7e-4b1939216e78"),
                             IsDeleted = false,
                             Location = "Plovdiv",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("e49870ab-df14-4c23-9e11-6debb4134872"),
+                            Id = new Guid("c4da36c6-bb39-4107-8565-1a8236e82bf4"),
                             IsDeleted = false,
                             Location = "Varna",
                             Name = "Cinemax"
@@ -198,9 +201,6 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("nvarchar(2083)")
                         .HasDefaultValue("/images/1.jpg");
 
-                    b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
-
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
@@ -216,23 +216,21 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6a14ba31-c193-40c3-a520-525f82a88d9b"),
+                            Id = new Guid("34e57932-09a0-40ae-ae6f-331c8cd0be59"),
                             Description = "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.",
                             Director = "Mike Newel",
                             Duration = 157,
                             Genre = "Fantasy",
-                            IsDeleted = false,
                             ReleaseDate = new DateTime(2005, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "Harry Potter and the Goblet of Fire"
                         },
                         new
                         {
-                            Id = new Guid("dfdcf1bf-0d1f-45ea-809b-fcc58a0f56a5"),
+                            Id = new Guid("3df0e234-cfcf-4f2c-adf2-c648f477d3c3"),
                             Description = "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ",
                             Director = "Peter Jackson",
                             Duration = 178,
                             Genre = "Fantasy",
-                            IsDeleted = false,
                             ReleaseDate = new DateTime(2001, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "Lord of the Rings"
                         });

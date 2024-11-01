@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaWebApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
-    [Migration("20241101013549_Master_Architecture_Rearrangement")]
-    partial class Master_Architecture_Rearrangement
+    [Migration("20241101111114_MoviePropertyIsDeleted")]
+    partial class MoviePropertyIsDeleted
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -112,6 +112,9 @@ namespace CinemaWebApp.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Location")
                         .IsRequired()
                         .HasMaxLength(85)
@@ -129,19 +132,22 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("2dd9f6af-3519-4eba-9a78-2d473a2dbbd9"),
+                            Id = new Guid("95045fcd-c01c-4253-b128-348a4e7386c2"),
+                            IsDeleted = false,
                             Location = "Sofia",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("79f96d3e-2d40-4dcf-9d7e-497c89039353"),
+                            Id = new Guid("00603667-29d7-4f3a-a779-37e189ac4227"),
+                            IsDeleted = false,
                             Location = "Plovdiv",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("44a76528-73b4-4b1e-b85b-b206cf78e0f8"),
+                            Id = new Guid("e49870ab-df14-4c23-9e11-6debb4134872"),
+                            IsDeleted = false,
                             Location = "Varna",
                             Name = "Cinemax"
                         });
@@ -156,9 +162,7 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bit")
-                        .HasDefaultValue(false);
+                        .HasColumnType("bit");
 
                     b.HasKey("CinemaId", "MovieId");
 
@@ -197,6 +201,9 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("nvarchar(2083)")
                         .HasDefaultValue("/images/1.jpg");
 
+                    b.Property<bool>("IsDeleted")
+                        .HasColumnType("bit");
+
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
@@ -212,21 +219,23 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("93616c84-c95e-43ca-8d05-2b6f2ec1dd13"),
+                            Id = new Guid("6a14ba31-c193-40c3-a520-525f82a88d9b"),
                             Description = "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.",
                             Director = "Mike Newel",
                             Duration = 157,
                             Genre = "Fantasy",
+                            IsDeleted = false,
                             ReleaseDate = new DateTime(2005, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "Harry Potter and the Goblet of Fire"
                         },
                         new
                         {
-                            Id = new Guid("0788070d-ed5c-415e-bcd3-802864b15ee5"),
+                            Id = new Guid("dfdcf1bf-0d1f-45ea-809b-fcc58a0f56a5"),
                             Description = "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ",
                             Director = "Peter Jackson",
                             Duration = 178,
                             Genre = "Fantasy",
+                            IsDeleted = false,
                             ReleaseDate = new DateTime(2001, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             Title = "Lord of the Rings"
                         });
@@ -245,6 +254,7 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Price")
+                        .HasPrecision(18, 2)
                         .HasColumnType("decimal(18,2)");
 
                     b.Property<Guid>("UserId")
@@ -340,12 +350,10 @@ namespace CinemaWebApp.Data.Migrations
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderKey")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
@@ -381,12 +389,10 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Name")
-                        .HasMaxLength(128)
-                        .HasColumnType("nvarchar(128)");
+                        .HasColumnType("nvarchar(450)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -420,7 +426,7 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasOne("CinemaWebApp.Data.Models.Cinema", "Cinema")
                         .WithMany("CinemaMovies")
                         .HasForeignKey("CinemaId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CinemaWebApp.Data.Models.Movie", "Movie")

@@ -2,6 +2,7 @@
 {
     using CinemaWebApp.Controllers;
     using CinemaWebApp.Models.Data;
+    using CinemaWebApp.Services.Data;
     using CinemaWebApp.Services.Data.Contracts;
     using Microsoft.AspNetCore.Mvc;
     using ViewModels.Movie;
@@ -25,6 +26,13 @@
                 await this.movieService.GetAllMoviesAsync();
 
             return this.View(allMovies);
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> Manage()
+        {
+            IEnumerable<AllMoviesIndexViewModel> movies = await this.movieService.GetAllMoviesAsync();
+            return this.View(movies);
         }
 
         [HttpGet]
@@ -77,6 +85,46 @@
             return this.View(movie);
         }
 
+        // GET: Movie/Edit/{id}
+        [HttpGet]
+        public async Task<IActionResult> Edit(string id)
+        {
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var movieGuid))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            EditMovieFormModel? model = await movieService.GetMovieEditModelByIdAsync(movieGuid);
+
+            if (model == null)
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(model);
+        }
+
+        // POST: Movie/Edit/{id}
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(EditMovieFormModel model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return View(model);
+            }
+
+            var isUpdated = await movieService.UpdateMovieAsync(model);
+
+            if (!isUpdated)
+            {
+                ModelState.AddModelError(string.Empty, "Unable to update the movie.");
+                return View(model);
+            }
+
+            return RedirectToAction(nameof(Index));
+        }
+
         [HttpGet]
         public async Task<IActionResult> AddToProgram(string? id)
         {
@@ -120,6 +168,46 @@
             }
 
             return this.RedirectToAction(nameof(Index), "Cinema");
+        }
+
+        [HttpGet]
+        public async Task<IActionResult> SoftDelete(string? id)
+        {
+            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var movieGuid))
+            {
+                return RedirectToAction(nameof(Manage));
+            }
+
+            MovieDetailsViewModel? movie = await movieService.GetMovieDetailsByIdAsync(movieGuid);
+
+            if (movie == null)
+            {
+                return RedirectToAction(nameof(Manage));
+            }
+
+            return View(movie);
+        }
+
+        // POST: Movie/SoftDelete/{id}
+        [HttpPost, ActionName("SoftDelete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> SoftDeleteConfirmed(string id)
+        {
+            if (!Guid.TryParse(id, out var movieGuid))
+            {
+                return RedirectToAction(nameof(Index));
+            }
+
+            bool isSoftDeleted = await this.movieService.SoftDeleteMovieAsync(movieGuid);
+
+            if (!isSoftDeleted)
+            {
+                // Display an error message if deletion was restricted
+                TempData["ErrorMessage"] = "Unable to delete movie. It may be currently showing in cinemas.";
+                return RedirectToAction(nameof(Details), new { id = id });
+            }
+
+            return RedirectToAction(nameof(Index)); // Redirect to the movie list or any other appropriate view
         }
     }
 }

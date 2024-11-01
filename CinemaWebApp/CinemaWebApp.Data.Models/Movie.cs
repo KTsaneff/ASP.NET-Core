@@ -20,6 +20,8 @@ namespace CinemaWebApp.Data.Models
 
         public string? ImageUrl { get; set; } = null!;
 
+        public bool IsDeleted { get; set; } = false;
+
         public virtual ICollection<CinemaMovie> MovieCinemas { get; set; }
             = new HashSet<CinemaMovie>();
 

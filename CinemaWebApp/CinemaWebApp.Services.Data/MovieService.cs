@@ -29,6 +29,7 @@
         {
             return await movieRepository
                 .GetAllAttached()
+                .Where(m => m.IsDeleted == false)
                 .To<AllMoviesIndexViewModel>()
                 .ToArrayAsync();
         }
@@ -54,16 +55,19 @@
 
         public async Task<MovieDetailsViewModel?> GetMovieDetailsByIdAsync(Guid id)
         {
-            Movie? movie = await this.movieRepository
-                .GetByIdAsync(id);
-            MovieDetailsViewModel? viewModel = null;
-            if (movie != null)
+            Movie? movie = await this.movieRepository.GetByIdAsync(id);
+
+            if (movie == null)
             {
-                AutoMapperConfig.MapperInstance.Map(movie, viewModel);
+                return null;
             }
+
+            MovieDetailsViewModel viewModel = new MovieDetailsViewModel();
+            AutoMapperConfig.MapperInstance.Map(movie, viewModel);
 
             return viewModel;
         }
+
 
         public async Task<AddMovieToCinemaInputModel?> GetAddMovieToCinemaInputModelByIdAsync(Guid id)
         {
@@ -153,5 +157,63 @@
 
             return true;
         }
+
+        public async Task<EditMovieFormModel?> GetMovieEditModelByIdAsync(Guid id)
+        {
+            var movie = await movieRepository.GetByIdAsync(id);
+
+            if (movie == null)
+            {
+                return null; // Movie not found
+            }
+
+            // Use AutoMapper to map the movie to EditMovieFormModel
+            return AutoMapperConfig.MapperInstance.Map<EditMovieFormModel>(movie);
+        }
+
+        public async Task<bool> UpdateMovieAsync(EditMovieFormModel model)
+        {
+            var movie = await movieRepository.GetByIdAsync(model.Id);
+            if (movie == null)
+            {
+                return false; // Movie not found
+            }
+
+            // Manual mapping
+            movie.Title = model.Title;
+            movie.Genre = model.Genre;
+            movie.ReleaseDate = model.ReleaseDate;
+            movie.Duration = model.Duration;
+            movie.Director = model.Director;
+            movie.Description = model.Description;
+            movie.ImageUrl = model.ImageUrl;
+
+            return await movieRepository.UpdateAsync(movie); // Assuming UpdateAsync returns bool
+        }
+
+        public async Task<bool> SoftDeleteMovieAsync(Guid id)
+        {
+            var movie = await this.movieRepository.GetAllAttached()
+                .Include(m => m.MovieCinemas)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (movie == null)
+            {
+                return false; // Movie not found
+            }
+
+            bool isShowingInCinemas = movie.MovieCinemas.Any(mc => !mc.IsDeleted);
+            if (isShowingInCinemas)
+            {
+                return false; // Restriction: movie is currently showing in cinemas
+            }
+
+            movie.IsDeleted = true;
+
+            await this.movieRepository.UpdateAsync(movie);
+
+            return true;
+        }
+
     }
 }

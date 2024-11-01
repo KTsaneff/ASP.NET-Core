@@ -1,0 +1,37 @@
+﻿@model IEnumerable<CinemaWebApp.Web.ViewModels.Movie.AllMoviesIndexViewModel>
+
+<h2>Manage Movies</h2>
+
+<div class="mb-3">
+    <a asp-action="Create" class="btn btn-success">Add New Movie</a>
+</div>
+
+<table class="table table-striped">
+    <thead>
+        <tr>
+            <th>Title</th>
+            <th>Genre</th>
+            <th>Release Date</th>
+            <th>Director</th>
+            <th>Duration</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var movie in Model)
+        {
+            <tr>
+                <td>@movie.Title</td>
+                <td>@movie.Genre</td>
+                <td>@movie.ReleaseDate</td>
+                <td>@movie.Director</td>
+                <td>@movie.Duration</td>
+                <td>
+                    <a asp-action="Details" asp-route-id="@movie.Id" class="btn btn-info btn-sm">Details</a>
+                    <a asp-action="Edit" asp-route-id="@movie.Id" class="btn btn-primary btn-sm">Edit</a>
+                    <a asp-action="SoftDelete" asp-route-id="@movie.Id" class="btn btn-danger btn-sm">Delete</a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

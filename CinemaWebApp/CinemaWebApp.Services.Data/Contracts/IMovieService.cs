@@ -13,5 +13,11 @@ namespace CinemaWebApp.Services.Data.Contracts
         Task<AddMovieToCinemaInputModel?> GetAddMovieToCinemaInputModelByIdAsync(Guid id);
 
         Task<bool> AddMovieToCinemasAsync(Guid movieId, AddMovieToCinemaInputModel model);
+
+        Task<EditMovieFormModel?> GetMovieEditModelByIdAsync(Guid id);
+
+        Task<bool> UpdateMovieAsync(EditMovieFormModel model);
+
+        Task<bool> SoftDeleteMovieAsync(Guid id);
     }
 }

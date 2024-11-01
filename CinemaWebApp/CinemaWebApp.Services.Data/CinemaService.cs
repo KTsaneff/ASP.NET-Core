@@ -49,6 +49,7 @@
             {
                 viewModel = new CinemaDetailsViewModel()
                 {
+                    Id = cinema.Id, // Populate the Id here
                     Name = cinema.Name,
                     Location = cinema.Location,
                     Movies = cinema.CinemaMovies
@@ -63,6 +64,65 @@
             }
 
             return viewModel;
+        }
+
+
+        public async Task<EditCinemaFormModel?> GetCinemaEditModelByIdAsync(Guid id)
+        {
+            var cinema = await this.cinemaRepository
+                .GetAllAttached()
+                .Where(c => c.Id == id)
+                .Select(c => new EditCinemaFormModel
+                {
+                    Name = c.Name,
+                    Location = c.Location
+                })
+                .FirstOrDefaultAsync();
+
+            return cinema;
+        }
+
+        public async Task<bool> UpdateCinemaAsync(EditCinemaFormModel model)
+        {
+            Cinema? cinema = await this.cinemaRepository
+                .GetAllAttached()
+                .FirstOrDefaultAsync(c => c.Id.ToString() == model.Id);
+
+            if (cinema == null)
+            {
+                return false;
+            }
+
+            cinema.Name = model.Name;
+            cinema.Location = model.Location;
+
+            await this.cinemaRepository.UpdateAsync(cinema);
+
+            return true;
+        }
+
+        public async Task<bool> SoftDeleteCinemaAsync(Guid id)
+        {
+            var cinema = await this.cinemaRepository.GetAllAttached()
+                .Include(c => c.CinemaMovies)
+                .FirstOrDefaultAsync(c => c.Id == id);
+
+            if (cinema == null)
+            {
+                return false;
+            }
+
+            bool hasActiveMovies = cinema.CinemaMovies.Any(cm => !cm.IsDeleted);
+            if (hasActiveMovies)
+            {
+                return false; // Restriction: cinema has active movies
+            }
+
+            cinema.IsDeleted = true;
+
+            await this.cinemaRepository.UpdateAsync(cinema);
+
+            return true;
         }
     }
 }

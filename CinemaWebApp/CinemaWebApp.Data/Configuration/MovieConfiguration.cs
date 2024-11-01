@@ -12,8 +12,9 @@
     {
         public void Configure(EntityTypeBuilder<Movie> builder)
         {
-            // Fluent API
             builder.HasKey(m => m.Id);
+
+            builder.HasQueryFilter(m => !m.IsDeleted);
 
             builder
                 .Property(m => m.Title)

@@ -1,5 +1,3 @@
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
-
 namespace CinemaApp.Web
 {
     using CinemaWebApp.Data.Models;
@@ -34,6 +32,7 @@ namespace CinemaApp.Web
                     ConfigureIdentity(builder, cfg);
                 })
                 .AddEntityFrameworkStores<AppDbContext>()
+                .AddDefaultTokenProviders()
                 .AddRoles<IdentityRole<Guid>>()
                 .AddSignInManager<SignInManager<ApplicationUser>>()
                 .AddUserManager<UserManager<ApplicationUser>>();

@@ -10,8 +10,11 @@ namespace CinemaWebApp.Data.Models
 
         public string Location { get; set; } = null!;
 
-        public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        // This property is used to mark the cinema as deleted
+        public bool IsDeleted { get; set; } = false;
 
         public virtual ICollection<CinemaMovie> CinemaMovies { get; set; } = new List<CinemaMovie>();
+
+        public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 }

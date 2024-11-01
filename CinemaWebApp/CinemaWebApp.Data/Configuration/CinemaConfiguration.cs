@@ -22,6 +22,8 @@
                 .IsRequired()
                 .HasMaxLength(LocationMaxLength);
 
+            builder.HasQueryFilter(c => !c.IsDeleted);
+
             builder.HasData(this.GenerateCinemas());
         }
 

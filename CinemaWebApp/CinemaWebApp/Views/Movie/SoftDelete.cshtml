@@ -1,0 +1,19 @@
+﻿@model CinemaWebApp.Web.ViewModels.Movie.MovieDetailsViewModel
+
+<h2>Delete Movie</h2>
+
+@if (TempData["ErrorMessage"] != null)
+{
+    <div class="alert alert-danger">
+        @TempData["ErrorMessage"]
+    </div>
+}
+
+<p>Are you sure you want to delete the movie: <strong>@Model.Title</strong>?</p>
+
+<form asp-action="SoftDelete" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" asp-for="Id" />
+    <button type="submit" class="btn btn-danger">Yes, Delete</button>
+    <a asp-action="Index" class="btn btn-secondary">Cancel</a>
+</form>
