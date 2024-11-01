@@ -1,11 +1,14 @@
-﻿namespace CinemaWebApp.ViewModels
+﻿using CinemaWebApp.Web.ViewModels.Movie;
+
+namespace CinemaWebApp.Web.ViewModels.Cinema
 {
     public class CinemaDetailsViewModel
     {
-        public int Id { get; set; }
         public string Name { get; set; } = null!;
+
         public string Location { get; set; } = null!;
 
-        public List<MovieProgramViewModel> Movies { get; set; } = new List<MovieProgramViewModel>();
+        public IEnumerable<CinemaMovieViewModel> Movies { get; set; }
+            = new HashSet<CinemaMovieViewModel>();
     }
 }

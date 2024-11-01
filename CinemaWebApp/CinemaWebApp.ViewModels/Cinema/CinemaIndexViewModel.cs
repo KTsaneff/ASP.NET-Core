@@ -1,17 +1,14 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace CinemaWebApp.ViewModels
+﻿namespace CinemaWebApp.Web.ViewModels.Cinema
 {
-    public class CinemaIndexViewModel
-    {
-        public int Id { get; set; }
+    using CinemaWebApp.Services.Mapping;
+    using CinemaWebApp.Data.Models;
 
-        [Required(ErrorMessage = "Cinema name is required.")]
-        [StringLength(80, ErrorMessage = "Cinema name is too long.")]
+    public class CinemaIndexViewModel : IMapFrom<Cinema>
+    {
+        public string Id { get; set; } = null!;
+
         public string Name { get; set; } = null!;
 
-        [Required(ErrorMessage = "Location is required.")]
-        [StringLength(50, ErrorMessage = "Location is too long.")]
         public string Location { get; set; } = null!;
     }
 }

@@ -1,131 +1,125 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using CinemaWebApp.Models; //Include the Movie model
-using System.Collections.Generic;
-using CinemaWebApp.Models.Data;
-using CinemaWebApp.ViewModels; //For handling lists
-
-namespace CinemaWebApp.Controllers
+﻿namespace CinemaWebApp.Web.Controllers
 {
-    public class MovieController : Controller
+    using CinemaWebApp.Controllers;
+    using CinemaWebApp.Models.Data;
+    using CinemaWebApp.Services.Data.Contracts;
+    using Microsoft.AspNetCore.Mvc;
+    using ViewModels.Movie;
+    using static Common.EntityValidationConstants.Movie;
+
+    public class MovieController : BaseController
     {
-        private readonly AppDbContext _context;
+        private readonly AppDbContext dbContext;
+        private readonly IMovieService movieService;
 
-        public MovieController(AppDbContext context)
+        public MovieController(AppDbContext dbContext, IMovieService movieService)
         {
-            _context = context;
-        }
-
-        public IActionResult Index()
-        {
-            var movies = _context.Movies.ToList();
-            return View(movies);
+            this.dbContext = dbContext;
+            this.movieService = movieService;
         }
 
         [HttpGet]
-        public IActionResult Create()
+        public async Task<IActionResult> Index()
         {
-            return View(new MovieViewModel());
+            IEnumerable<AllMoviesIndexViewModel> allMovies =
+                await this.movieService.GetAllMoviesAsync();
+
+            return this.View(allMovies);
+        }
+
+        [HttpGet]
+#pragma warning disable CS1998
+        public async Task<IActionResult> Create()
+#pragma warning restore CS1998
+        {
+            return this.View();
         }
 
         [HttpPost]
-        public IActionResult Create(MovieViewModel viewModel)
+        public async Task<IActionResult> Create(AddMovieInputModel inputModel)
         {
-            //Validate the input data using ModelState
-            if (ModelState.IsValid)
+            if (!this.ModelState.IsValid)
             {
-                //Map the view model to the Movie entity
-                var movie = new Movie
-                {
-                    Title = viewModel.Title,
-                    Genre = viewModel.Genre,
-                    ReleaseDate = viewModel.ReleaseDate,
-                    Director = viewModel.Director,
-                    Duration = viewModel.Duration,
-                    Description = viewModel.Description,
-                    ImageUrl = viewModel.ImageUrl
-                };
-
-                _context.Movies.Add(movie);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
+                // Render the same form with user entered values + model errors 
+                return this.View(inputModel);
             }
 
-            return View(viewModel);
-        }
-
-        public IActionResult Details(int id)
-        {
-            var movie = _context.Movies.Find(id); // Find the movie by id
-
-            if(movie == null)
+            bool result = await this.movieService.AddMovieAsync(inputModel);
+            if (result == false)
             {
-                return NotFound(); // Return 404 Not Found
+                this.ModelState.AddModelError(nameof(inputModel.ReleaseDate),
+                    String.Format("The Release Date must be in the following format: {0}", ReleaseDateFormat));
+                return this.View(inputModel);
             }
 
-            return View(movie);
+            return this.RedirectToAction(nameof(Index));
         }
 
         [HttpGet]
-        public IActionResult AddToProgram(int movieId)
+        public async Task<IActionResult> Details(string? id)
         {
-            //Find the movie by its id
-            var movie = _context.Movies.Find(movieId);
+            Guid movieGuid = Guid.Empty;
+            bool isGuidValid = this.IsGuidValid(id, ref movieGuid);
+            if (!isGuidValid)
+            {
+                // Invalid id format
+                return this.RedirectToAction(nameof(Index));
+            }
 
-            //If the movie is not found, redirect to the Index action
+            MovieDetailsViewModel? movie = await this.movieService
+                .GetMovieDetailsByIdAsync(movieGuid);
             if (movie == null)
             {
-                return RedirectToAction("Index");
+                // Non-existing movie guid
+                return this.RedirectToAction(nameof(Index));
             }
 
-            //Retrieve all cinemas from the database
-            var cinemas = _context.Cinemas.ToList();
+            return this.View(movie);
+        }
 
-
-            //Create a view model to pass the movie and cinema data to the view
-            AddMovieToCinemaProgramViewModel viewModel = new AddMovieToCinemaProgramViewModel
+        [HttpGet]
+        public async Task<IActionResult> AddToProgram(string? id)
+        {
+            Guid movieGuid = Guid.Empty;
+            bool isGuidValid = this.IsGuidValid(id, ref movieGuid);
+            if (!isGuidValid)
             {
-                MovieId = movie.Id,         //Set the movie id
-                MovieTitle = movie.Title,   //Set the movie title
-                Cinemas = cinemas.Select(c => new CinemaCheckBoxItem
-                {
-                    Id = c.Id,              //Set the cinema id
-                    Name = c.Name,          //Set the cinema name
-                    IsSelected = false      //Set the default selection status
-                }).ToList()
-            };
+                return this.RedirectToAction(nameof(Index));
+            }
 
-            //Pass the view model to the view
-            return View(viewModel);
+            AddMovieToCinemaInputModel? viewModel = await this.movieService
+                .GetAddMovieToCinemaInputModelByIdAsync(movieGuid);
+            if (viewModel == null)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            return this.View(viewModel);
         }
 
         [HttpPost]
-        public IActionResult AddToProgram(AddMovieToCinemaProgramViewModel model)
+        public async Task<IActionResult> AddToProgram(AddMovieToCinemaInputModel model)
         {
-            if (!ModelState.IsValid)
+            if (!this.ModelState.IsValid)
             {
-                return View(model);
+                return this.View(model);
             }
-            var existingAssignments = _context.CinemasMovies
-                .Where(cm => cm.MovieId == model.MovieId)
-                .ToList();
-            _context.RemoveRange(existingAssignments);
 
-            foreach(var cinema in model.Cinemas)
+            Guid movieGuid = Guid.Empty;
+            bool isGuidValid = this.IsGuidValid(model.Id, ref movieGuid);
+            if (!isGuidValid)
             {
-                if (cinema.IsSelected)
-                {
-                    var cinemaMovie = new CinemaMovie
-                    {
-                        CinemaId = cinema.Id,
-                        MovieId = model.MovieId
-                    };
-
-                    _context.CinemasMovies.Add(cinemaMovie);
-                }
+                return this.RedirectToAction(nameof(Index));
             }
-            _context.SaveChanges();
-            return RedirectToAction("Index");
+
+            bool result = await this.movieService
+                .AddMovieToCinemasAsync(movieGuid, model);
+            if (result == false)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            return this.RedirectToAction(nameof(Index), "Cinema");
         }
     }
 }

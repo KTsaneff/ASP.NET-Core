@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace CinemaWebApp.Migrations
+namespace CinemaWebApp.Data.Migrations
 {
     [DbContext(typeof(AppDbContext))]
     partial class AppDbContextModelSnapshot : ModelSnapshot
@@ -24,8 +24,9 @@ namespace CinemaWebApp.Migrations
 
             modelBuilder.Entity("CinemaWebApp.Data.Models.ApplicationUser", b =>
                 {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<int>("AccessFailedCount")
                         .HasColumnType("int");
@@ -87,34 +88,74 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetUsers", (string)null);
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.Cinema", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.ApplicationUserMovie", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.Property<Guid>("ApplicationUserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.HasKey("ApplicationUserId", "MovieId");
+
+                    b.HasIndex("MovieId");
+
+                    b.ToTable("UsersMovies");
+                });
+
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Cinema", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Location")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(85)
+                        .HasColumnType("nvarchar(85)");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Cinemas");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("2dd9f6af-3519-4eba-9a78-2d473a2dbbd9"),
+                            Location = "Sofia",
+                            Name = "Cinema city"
+                        },
+                        new
+                        {
+                            Id = new Guid("79f96d3e-2d40-4dcf-9d7e-497c89039353"),
+                            Location = "Plovdiv",
+                            Name = "Cinema city"
+                        },
+                        new
+                        {
+                            Id = new Guid("44a76528-73b4-4b1e-b85b-b206cf78e0f8"),
+                            Location = "Varna",
+                            Name = "Cinemax"
+                        });
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.CinemaMovie", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.CinemaMovie", b =>
                 {
-                    b.Property<int>("CinemaId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("CinemaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<bool>("IsDeleted")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.HasKey("CinemaId", "MovieId");
 
@@ -123,72 +164,90 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("CinemasMovies");
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.Movie", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Movie", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("Description")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("Director")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(80)
+                        .HasColumnType("nvarchar(80)");
 
                     b.Property<int>("Duration")
                         .HasColumnType("int");
 
                     b.Property<string>("Genre")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(2083)
+                        .HasColumnType("nvarchar(2083)")
+                        .HasDefaultValue("/images/1.jpg");
 
                     b.Property<DateTime>("ReleaseDate")
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Title")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
                     b.ToTable("Movies");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = new Guid("93616c84-c95e-43ca-8d05-2b6f2ec1dd13"),
+                            Description = "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.",
+                            Director = "Mike Newel",
+                            Duration = 157,
+                            Genre = "Fantasy",
+                            ReleaseDate = new DateTime(2005, 11, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Harry Potter and the Goblet of Fire"
+                        },
+                        new
+                        {
+                            Id = new Guid("0788070d-ed5c-415e-bcd3-802864b15ee5"),
+                            Description = "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ",
+                            Director = "Peter Jackson",
+                            Duration = 178,
+                            Genre = "Fantasy",
+                            ReleaseDate = new DateTime(2001, 5, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
+                            Title = "Lord of the Rings"
+                        });
                 });
 
             modelBuilder.Entity("CinemaWebApp.Models.Ticket", b =>
                 {
-                    b.Property<int>("Id")
+                    b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                        .HasColumnType("uniqueidentifier");
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+                    b.Property<Guid>("CinemaId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("ApplicationUserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("CinemaId")
-                        .HasColumnType("int");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
+                    b.Property<Guid>("MovieId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<decimal>("Price")
                         .HasColumnType("decimal(18,2)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
-
-                    b.HasIndex("ApplicationUserId");
 
                     b.HasIndex("CinemaId");
 
@@ -199,25 +258,11 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("Tickets");
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.UserMovie", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
-
-                    b.Property<int>("MovieId")
-                        .HasColumnType("int");
-
-                    b.HasKey("UserId", "MovieId");
-
-                    b.HasIndex("MovieId");
-
-                    b.ToTable("UsersMovies");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRole", b =>
-                {
-                    b.Property<string>("Id")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ConcurrencyStamp")
                         .IsConcurrencyToken()
@@ -241,7 +286,7 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -255,9 +300,8 @@ namespace CinemaWebApp.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("RoleId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -266,7 +310,7 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetRoleClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -280,9 +324,8 @@ namespace CinemaWebApp.Migrations
                     b.Property<string>("ClaimValue")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("Id");
 
@@ -291,20 +334,21 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetUserClaims", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderKey")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("ProviderDisplayName")
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<string>("UserId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("LoginProvider", "ProviderKey");
 
@@ -313,13 +357,13 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetUserLogins", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
-                    b.Property<string>("RoleId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("RoleId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.HasKey("UserId", "RoleId");
 
@@ -328,16 +372,18 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetUserRoles", (string)null);
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
-                    b.Property<string>("UserId")
-                        .HasColumnType("nvarchar(450)");
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("LoginProvider")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Name")
-                        .HasColumnType("nvarchar(450)");
+                        .HasMaxLength(128)
+                        .HasColumnType("nvarchar(128)");
 
                     b.Property<string>("Value")
                         .HasColumnType("nvarchar(max)");
@@ -347,18 +393,37 @@ namespace CinemaWebApp.Migrations
                     b.ToTable("AspNetUserTokens", (string)null);
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.CinemaMovie", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.ApplicationUserMovie", b =>
                 {
-                    b.HasOne("CinemaWebApp.Models.Cinema", "Cinema")
-                        .WithMany("CinemaMovies")
-                        .HasForeignKey("CinemaId")
+                    b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", "ApplicationUser")
+                        .WithMany("ApplicationUserMovies")
+                        .HasForeignKey("ApplicationUserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CinemaWebApp.Models.Movie", "Movie")
-                        .WithMany("CinemaMovies")
+                    b.HasOne("CinemaWebApp.Data.Models.Movie", "Movie")
+                        .WithMany("MovieApplicationUsers")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("ApplicationUser");
+
+                    b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("CinemaWebApp.Data.Models.CinemaMovie", b =>
+                {
+                    b.HasOne("CinemaWebApp.Data.Models.Cinema", "Cinema")
+                        .WithMany("CinemaMovies")
+                        .HasForeignKey("CinemaId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("CinemaWebApp.Data.Models.Movie", "Movie")
+                        .WithMany("MovieCinemas")
+                        .HasForeignKey("MovieId")
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Cinema");
@@ -368,26 +433,22 @@ namespace CinemaWebApp.Migrations
 
             modelBuilder.Entity("CinemaWebApp.Models.Ticket", b =>
                 {
-                    b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", null)
-                        .WithMany("Tickets")
-                        .HasForeignKey("ApplicationUserId");
-
-                    b.HasOne("CinemaWebApp.Models.Cinema", "Cinema")
+                    b.HasOne("CinemaWebApp.Data.Models.Cinema", "Cinema")
                         .WithMany("Tickets")
                         .HasForeignKey("CinemaId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("CinemaWebApp.Models.Movie", "Movie")
+                    b.HasOne("CinemaWebApp.Data.Models.Movie", "Movie")
                         .WithMany("Tickets")
                         .HasForeignKey("MovieId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", "User")
-                        .WithMany()
+                        .WithMany("Tickets")
                         .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Restrict)
+                        .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.Navigation("Cinema");
@@ -397,35 +458,16 @@ namespace CinemaWebApp.Migrations
                     b.Navigation("User");
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.UserMovie", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<System.Guid>", b =>
                 {
-                    b.HasOne("CinemaWebApp.Models.Movie", "Movie")
-                        .WithMany()
-                        .HasForeignKey("MovieId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Movie");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserClaim<System.Guid>", b =>
                 {
                     b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", null)
                         .WithMany()
@@ -434,7 +476,7 @@ namespace CinemaWebApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserLogin<System.Guid>", b =>
                 {
                     b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", null)
                         .WithMany()
@@ -443,9 +485,9 @@ namespace CinemaWebApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserRole<System.Guid>", b =>
                 {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole", null)
+                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityRole<System.Guid>", null)
                         .WithMany()
                         .HasForeignKey("RoleId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -458,7 +500,7 @@ namespace CinemaWebApp.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<string>", b =>
+            modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityUserToken<System.Guid>", b =>
                 {
                     b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", null)
                         .WithMany()
@@ -469,19 +511,23 @@ namespace CinemaWebApp.Migrations
 
             modelBuilder.Entity("CinemaWebApp.Data.Models.ApplicationUser", b =>
                 {
+                    b.Navigation("ApplicationUserMovies");
+
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.Cinema", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Cinema", b =>
                 {
                     b.Navigation("CinemaMovies");
 
                     b.Navigation("Tickets");
                 });
 
-            modelBuilder.Entity("CinemaWebApp.Models.Movie", b =>
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Movie", b =>
                 {
-                    b.Navigation("CinemaMovies");
+                    b.Navigation("MovieApplicationUsers");
+
+                    b.Navigation("MovieCinemas");
 
                     b.Navigation("Tickets");
                 });

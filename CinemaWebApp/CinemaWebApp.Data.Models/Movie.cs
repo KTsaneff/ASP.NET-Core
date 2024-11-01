@@ -1,8 +1,10 @@
-﻿namespace CinemaWebApp.Models
+﻿using CinemaWebApp.Models;
+
+namespace CinemaWebApp.Data.Models
 {
     public class Movie
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = new Guid();
 
         public string Title { get; set; } = null!;
 
@@ -16,10 +18,14 @@
 
         public string Description { get; set; } = null!;
 
-        public string ImageUrl { get; set; } = null!;
+        public string? ImageUrl { get; set; } = null!;
 
-        public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
+        public virtual ICollection<CinemaMovie> MovieCinemas { get; set; }
+            = new HashSet<CinemaMovie>();
 
-        public virtual ICollection<CinemaMovie> CinemaMovies { get; set; } = new List<CinemaMovie>();
+        public virtual ICollection<ApplicationUserMovie> MovieApplicationUsers { get; set; }
+            = new HashSet<ApplicationUserMovie>();
+
+        public virtual ICollection<Ticket> Tickets { get; set; } = new HashSet<Ticket>();        
     }
 }

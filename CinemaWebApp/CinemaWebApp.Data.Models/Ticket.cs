@@ -1,21 +1,20 @@
 ﻿using CinemaWebApp.Data.Models;
-using Microsoft.AspNetCore.Identity;
 
 namespace CinemaWebApp.Models
 {
     public class Ticket
     {
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
         public decimal Price { get; set; }
 
-        public int CinemaId { get; set; }
-        public Cinema Cinema { get; set; } = null!;
+        public Guid CinemaId { get; set; }
+        public virtual Cinema Cinema { get; set; } = null!;
 
-        public int MovieId { get; set; }
-        public Movie Movie { get; set; } = null!;
+        public Guid MovieId { get; set; }
+        public virtual Movie Movie { get; set; } = null!;
 
-        public string UserId { get; set; } = null!;
-        public ApplicationUser User { get; set; } = null!;
+        public Guid UserId { get; set; }
+        public virtual ApplicationUser User { get; set; } = null!;
     }
 }

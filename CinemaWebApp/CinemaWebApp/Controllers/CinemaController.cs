@@ -1,87 +1,69 @@
-﻿using CinemaWebApp.Models;
-using CinemaWebApp.Models.Data;
-using CinemaWebApp.ViewModels;
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-
-namespace CinemaWebApp.Controllers
+﻿namespace CinemaWebApp.Web.Controllers
 {
-    public class CinemaController : Controller
+    using CinemaWebApp.Controllers;
+    using CinemaWebApp.Services.Data.Contracts;
+    using CinemaWebApp.Web.ViewModels.Cinema;
+    using Microsoft.AspNetCore.Mvc;
+
+    public class CinemaController : BaseController
     {
-        private readonly AppDbContext _context;
+        private readonly ICinemaService cinemaService;
 
-        public CinemaController(AppDbContext context)
+        public CinemaController(ICinemaService cinemaService)
         {
-            _context = context;
+            this.cinemaService = cinemaService;
         }
 
-        public IActionResult Index()
+        [HttpGet]
+        public async Task<IActionResult> Index()
         {
-            var cinemas = _context.Cinemas.ToList();
+            IEnumerable<CinemaIndexViewModel> cinemas =
+                await this.cinemaService.IndexGetAllOrderedByLocationAsync();
 
-            var cinemaIndexViewModels = cinemas.Select(c => new CinemaIndexViewModel
-            {
-                Id = c.Id,
-                Name = c.Name,
-                Location = c.Location
-            });
-
-            return View(cinemaIndexViewModels);
+            return this.View(cinemas);
         }
 
-        public IActionResult Create()
+        [HttpGet]
+#pragma warning disable CS1998
+        public async Task<IActionResult> Create()
+#pragma warning restore CS1998
         {
-            return View();
+            return this.View();
         }
 
         [HttpPost]
-        public IActionResult Create(CinemaIndexViewModel cinemaIndexViewModel)
+        public async Task<IActionResult> Create(AddCinemaFormModel model)
         {
-            if (ModelState.IsValid)
+            if (!this.ModelState.IsValid)
             {
-                var cinema = new Cinema
-                {
-                    Name = cinemaIndexViewModel.Name,
-                    Location = cinemaIndexViewModel.Location
-                };
-
-                _context.Cinemas.Add(cinema);
-                _context.SaveChanges();
-
-                return RedirectToAction("Index");
+                return this.View(model);
             }
 
-            return View(cinemaIndexViewModel);
+            await this.cinemaService.AddCinemaAsync(model);
+
+            return this.RedirectToAction(nameof(Index));
         }
 
-        public IActionResult Details(int id)
+        [HttpGet]
+        public async Task<IActionResult> Details(string? id)
         {
-            //Fetch cinema by its id, including its related movies
-            var cinema = _context.Cinemas
-                .Include(c => c.CinemaMovies)
-                .ThenInclude(cm => cm.Movie)
-                .FirstOrDefault(c => c.Id == id);
-
-            if (cinema == null)
+            Guid cinemaGuid = Guid.Empty;
+            bool isIdValid = this.IsGuidValid(id, ref cinemaGuid);
+            if (!isIdValid)
             {
-                return RedirectToAction("Index");
+                return this.RedirectToAction(nameof(Index));
             }
 
-            //Map the Cinema object to a CinemaDetailsViewModel object
-            var cinemaDetailsViewModel = new CinemaDetailsViewModel
-            {
-                Id = cinema.Id,
-                Name = cinema.Name,
-                Location = cinema.Location,
-                Movies = cinema.CinemaMovies.Select(cm => new MovieProgramViewModel
-                {
-                    Title = cm.Movie.Title,
-                    Duration = cm.Movie.Duration
-                }).ToList()
-            };
+            CinemaDetailsViewModel? viewModel = await this.cinemaService
+                .GetCinemaDetailsByIdAsync(cinemaGuid);
 
-            //Pass the CinemaDetailsViewModel object to the view
-            return View(cinemaDetailsViewModel);
+            // Invalid(non-existing) GUID in the URL
+            if (viewModel == null)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            return this.View(viewModel);
         }
     }
 }

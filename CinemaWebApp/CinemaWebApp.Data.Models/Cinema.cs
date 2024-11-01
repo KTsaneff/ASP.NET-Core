@@ -1,16 +1,13 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using CinemaWebApp.Models;
 
-namespace CinemaWebApp.Models
+namespace CinemaWebApp.Data.Models
 {
     public class Cinema
     {
-        [Key]
-        public int Id { get; set; }
+        public Guid Id { get; set; } = Guid.NewGuid();
 
-        [Required]
         public string Name { get; set; } = null!;
 
-        [Required]
         public string Location { get; set; } = null!;
 
         public virtual ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
