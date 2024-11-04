@@ -2,7 +2,6 @@
 {
     using CinemaWebApp.Controllers;
     using CinemaWebApp.Models.Data;
-    using CinemaWebApp.Services.Data;
     using CinemaWebApp.Services.Data.Contracts;
     using Microsoft.AspNetCore.Mvc;
     using ViewModels.Movie;

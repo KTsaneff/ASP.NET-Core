@@ -57,7 +57,6 @@ namespace CinemaApp.Web
 
             AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).Assembly);
 
-            // Configure the HTTP request pipeline.
             if (!app.Environment.IsDevelopment())
             {
                 app.UseExceptionHandler("/Home/Error");
@@ -70,14 +69,13 @@ namespace CinemaApp.Web
 
             app.UseRouting();
 
-            // Authorization can work only if we know who uses the application -> We need Authentication
-            app.UseAuthentication(); // First -> Who am I?
-            app.UseAuthorization(); // Second -> What can I do?
+            app.UseAuthentication();
+            app.UseAuthorization();
 
             app.MapControllerRoute(
                 name: "default",
                 pattern: "{controller=Home}/{action=Index}/{id?}");
-            app.MapRazorPages(); // Add routing to Identity Razor Pages
+            app.MapRazorPages();
 
             app.ApplyMigrations();
 

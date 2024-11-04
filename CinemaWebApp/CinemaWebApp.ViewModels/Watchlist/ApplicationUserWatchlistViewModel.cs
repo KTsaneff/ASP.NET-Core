@@ -10,6 +10,6 @@
 
         public string ReleaseDate { get; set; } = null!;
 
-        public string ImageUrl { get; set; } = null!;
+        public string? ImageUrl { get; set; } = null!;
     }
 }

@@ -3,21 +3,25 @@
     using CinemaWebApp.Controllers;
     using CinemaWebApp.Data.Models;
     using CinemaWebApp.Models.Data;
+    using CinemaWebApp.Services.Data.Contracts;
     using CinemaWebApp.Web.ViewModels.Watchlist;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.EntityFrameworkCore;
-    using static Common.EntityValidationConstants.Movie;
 
     [Authorize]
     public class WatchlistController : BaseController
     {
+        private readonly IWatchlistService watchlistService;
         private readonly AppDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public WatchlistController(AppDbContext dbContext, UserManager<ApplicationUser> userManager)
+        public WatchlistController(IWatchlistService watchlistService, 
+                                   AppDbContext dbContext, 
+                                   UserManager<ApplicationUser> userManager)
         {
+            this.watchlistService = watchlistService;
             this.dbContext = dbContext;
             this.userManager = userManager;
         }
@@ -27,19 +31,12 @@
         {
             string userId = this.userManager.GetUserId(User)!;
 
-            IEnumerable<ApplicationUserWatchlistViewModel> watchlist = await this.dbContext
-                .UsersMovies
-                .Include(um => um.Movie)
-                .Where(um => um.ApplicationUserId.ToString().ToLower() == userId.ToLower())
-                .Select(um => new ApplicationUserWatchlistViewModel()
-                {
-                    MovieId = um.MovieId.ToString(),
-                    Title = um.Movie.Title,
-                    Genre = um.Movie.Genre,
-                    ReleaseDate = um.Movie.ReleaseDate.ToString(ReleaseDateFormat),
-                    ImageUrl = um.Movie.ImageUrl
-                })
-                .ToListAsync();
+            if(string.IsNullOrWhiteSpace(userId))
+            {
+                return this.RedirectToPage("/Identity/Account/Login");
+            }
+
+           IEnumerable<ApplicationUserWatchlistViewModel> watchlist = await this.watchlistService.GetUserWatchlistByUserIdAsync(userId);
 
             return View(watchlist);
         }
