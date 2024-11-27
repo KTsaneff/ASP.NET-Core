@@ -1,47 +1,100 @@
-﻿using CinemaWebApp.Data.Models;
-using CinemaWebApp.Data.Repository.Contracts;
-using CinemaWebApp.Services.Data.Contracts;
-using CinemaWebApp.Web.ViewModels.Watchlist;
-using Microsoft.EntityFrameworkCore;
-using static CinemaWebApp.Common.EntityValidationConstants.Movie;
-
-namespace CinemaWebApp.Services.Data
+﻿namespace CinemaWebApp.Services.Data
 {
+    using Microsoft.EntityFrameworkCore;
+
+    using CinemaWebApp.Data.Models;
+    using CinemaWebApp.Data.Repository.Interfaces;
+    using Interfaces;
+    using Mapping;
+    using Web.ViewModels.Watchlist;
+
+    using static Common.EntityValidationConstants.Movie;
+
     public class WatchlistService : BaseService, IWatchlistService
     {
-        private readonly IRepository<ApplicationUserMovie, Guid> userMovieRepository;
+        private readonly IRepository<ApplicationUserMovie, object> userMovieRepository;
+        private readonly IRepository<Movie, Guid> movieRepository;
 
-        public WatchlistService(IRepository<ApplicationUserMovie, Guid> userMovieRepository)
+        public WatchlistService(IRepository<ApplicationUserMovie, object> userMovieRepository,
+            IRepository<Movie, Guid> movieRepository)
         {
             this.userMovieRepository = userMovieRepository;
+            this.movieRepository = movieRepository;
         }
 
-        public async Task<IEnumerable<ApplicationUserWatchlistViewModel>> GetUserWatchlistByUserIdAsync(string userId)
+        public async Task<IEnumerable<ApplicationUserWatchlistViewModel>> GetUserWatchListByUserIdAsync(string userId)
         {
             IEnumerable<ApplicationUserWatchlistViewModel> watchlist = await this.userMovieRepository
-               .GetAllAttached()
-               .Include(um => um.Movie)
-               .Where(um => um.ApplicationUserId.ToString().ToLower() == userId.ToLower())
-               .Select(um => new ApplicationUserWatchlistViewModel()
-               {
-                   MovieId = um.MovieId.ToString(),
-                   Title = um.Movie.Title,
-                   Genre = um.Movie.Genre,
-                   ReleaseDate = um.Movie.ReleaseDate.ToString(ReleaseDateFormat),
-                   ImageUrl = um.Movie.ImageUrl
-               })
-               .ToListAsync();
+                .GetAllAttached()
+                .Include(um => um.Movie)
+                .Where(um => um.ApplicationUserId.ToString().ToLower() == userId.ToLower())
+                .To<ApplicationUserWatchlistViewModel>()
+                .ToListAsync();
 
             return watchlist;
         }
-        public Task<bool> AddMovieToUserWatchlistAsync(string? movieId, string userId)
+
+        public async Task<bool> AddMovieToUserWatchListAsync(string? movieId, string userId)
         {
-            throw new NotImplementedException();
+            Guid movieGuid = Guid.Empty;
+            if (!this.IsGuidValid(movieId, ref movieGuid))
+            {
+                return false;
+            }
+
+            Movie? movie = await this.movieRepository
+                .GetByIdAsync(movieGuid);
+            if (movie == null)
+            {
+                return false;
+            }
+
+            Guid userGuid = Guid.Parse(userId);
+
+            ApplicationUserMovie? addedToWatchlistAlready = await this.userMovieRepository
+                .FirstOrDefaultAsync(um => um.MovieId == movieGuid &&
+                                           um.ApplicationUserId == userGuid);
+            if (addedToWatchlistAlready == null)
+            {
+                ApplicationUserMovie newUserMovie = new ApplicationUserMovie()
+                {
+                    ApplicationUserId = userGuid,
+                    MovieId = movieGuid
+                };
+
+                await this.userMovieRepository.AddAsync(newUserMovie);
+            }
+
+            return true;
         }
 
-        public Task<bool> RemoveMovieFromUserWatchlistAsync(string? movieId, string userId)
+        public async Task<bool> RemoveMovieFromUserWatchListAsync(string? movieId, string userId)
         {
-            throw new NotImplementedException();
+            Guid movieGuid = Guid.Empty;
+            if (!this.IsGuidValid(movieId, ref movieGuid))
+            {
+                return false;
+            }
+
+            Movie? movie = await this.movieRepository
+                .GetByIdAsync(movieGuid);
+            if (movie == null)
+            {
+                return false;
+            }
+
+            Guid userGuid = Guid.Parse(userId);
+
+            // TODO: Implement Soft-Delete
+            ApplicationUserMovie? applicationUserMovie = await this.userMovieRepository
+                .FirstOrDefaultAsync(um => um.MovieId == movieGuid &&
+                                           um.ApplicationUserId == userGuid);
+            if (applicationUserMovie != null)
+            {
+                await this.userMovieRepository.DeleteAsync(applicationUserMovie);
+            }
+
+            return true;
         }
     }
 }

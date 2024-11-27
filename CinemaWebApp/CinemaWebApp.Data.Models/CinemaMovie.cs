@@ -8,6 +8,8 @@
         public Guid MovieId { get; set; }
         public virtual Movie Movie { get; set; } = null!;
 
+        public int AvailableTickets { get; set; }
+
         public bool IsDeleted { get; set; }
     }
 }

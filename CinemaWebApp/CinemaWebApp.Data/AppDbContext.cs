@@ -22,6 +22,8 @@ namespace CinemaWebApp.Models.Data
         public virtual DbSet<ApplicationUserMovie> UsersMovies { get; set; }
         public virtual DbSet<Ticket> Tickets { get; set; }
 
+        public virtual DbSet<Manager> Managers { get; set; }
+
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);

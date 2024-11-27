@@ -1,4 +1,4 @@
-﻿using CinemaWebApp.Services.Data.Contracts;
+﻿using CinemaWebApp.Services.Data.Interfaces;
 
 namespace CinemaWebApp.Services.Data
 {

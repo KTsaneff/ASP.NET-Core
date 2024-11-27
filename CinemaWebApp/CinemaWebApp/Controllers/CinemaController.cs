@@ -1,15 +1,17 @@
 ﻿namespace CinemaWebApp.Web.Controllers
 {
     using CinemaWebApp.Controllers;
-    using CinemaWebApp.Services.Data.Contracts;
+    using CinemaWebApp.Services.Data.Interfaces;
     using CinemaWebApp.Web.ViewModels.Cinema;
+    using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
 
     public class CinemaController : BaseController
     {
         private readonly ICinemaService cinemaService;
 
-        public CinemaController(ICinemaService cinemaService)
+        public CinemaController(ICinemaService cinemaService, IManagerService managerService)
+            : base(managerService)
         {
             this.cinemaService = cinemaService;
         }
@@ -24,23 +26,30 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Manage()
-        {
-            IEnumerable<CinemaIndexViewModel> cinemas = await this.cinemaService.IndexGetAllOrderedByLocationAsync();
-            return this.View(cinemas);
-        }
-
-        [HttpGet]
+        [Authorize]
 #pragma warning disable CS1998
         public async Task<IActionResult> Create()
 #pragma warning restore CS1998
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
             return this.View();
         }
 
         [HttpPost]
+        [Authorize]
         public async Task<IActionResult> Create(AddCinemaFormModel model)
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
             if (!this.ModelState.IsValid)
             {
                 return this.View(model);
@@ -73,92 +82,84 @@
             return this.View(viewModel);
         }
 
-        // GET: Cinema/Edit/{id}
         [HttpGet]
-        public async Task<IActionResult> Edit(string id)
+        [Authorize]
+        public async Task<IActionResult> Manage()
         {
-            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var cinemaGuid))
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
             {
-                return RedirectToAction(nameof(Manage));
+                return this.RedirectToAction(nameof(Index));
             }
 
-            EditCinemaFormModel? cinema = await this.cinemaService.GetCinemaEditModelByIdAsync(cinemaGuid);
+            IEnumerable<CinemaIndexViewModel> cinemas =
+                await this.cinemaService.IndexGetAllOrderedByLocationAsync();
 
-            if (cinema == null)
+            return this.View(cinemas);
+        }
+        [HttpGet]
+        [Authorize]
+        public async Task<IActionResult> Edit(string? id)
+        {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
             {
-                return RedirectToAction(nameof(Manage));
+                // TODO: Implement notifications for error and warning messages!
+                return this.RedirectToAction(nameof(Index));
             }
 
-            return View(cinema);
+            Guid cinemaGuid = Guid.Empty;
+            bool isIdValid = this.IsGuidValid(id, ref cinemaGuid);
+            if (!isIdValid)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
+            EditCinemaFormModel? formModel = await this.cinemaService
+                .GetCinemaForEditByIdAsync(cinemaGuid);
+
+            return this.View(formModel);
         }
 
-        // POST: Cinema/Edit/{id}
         [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(string id, EditCinemaFormModel model)
+        [Authorize]
+        public async Task<IActionResult> Edit(EditCinemaFormModel formModel)
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (!isManager)
+            {
+                return this.RedirectToAction(nameof(Index));
+            }
+
             if (!ModelState.IsValid)
             {
-                return View(model);
+                return this.View(formModel);
             }
 
-            if (id != model.Id)
-            {
-                // Handle case where ID does not match
-                return RedirectToAction(nameof(Manage));
-            }
-
-            bool isUpdated = await this.cinemaService.UpdateCinemaAsync(model);
-
+            bool isUpdated = await this.cinemaService
+                .EditCinemaAsync(formModel);
             if (!isUpdated)
             {
-                ModelState.AddModelError(string.Empty, "Unable to update cinema.");
-                return View(model);
+                ModelState.AddModelError(string.Empty, "Unexpected error occurred while updating the cinema! Please contact administrator");
+                return this.View(formModel);
             }
 
-            return RedirectToAction(nameof(Manage));
+            return this.RedirectToAction(nameof(Details), "Cinema", new { id = formModel.Id });
         }
 
-        // GET: Cinema/SoftDelete/{id}
         [HttpGet]
-        public async Task<IActionResult> SoftDelete(string id)
+        [Authorize]
+        public async Task<IActionResult> ViewProgram(Guid id)
         {
-            if (string.IsNullOrEmpty(id) || !Guid.TryParse(id, out var cinemaGuid))
+            bool isManager = await this.IsUserManagerAsync();
+            if (isManager)
             {
-                return RedirectToAction(nameof(Manage));
+                return this.RedirectToAction(nameof(Index));
             }
 
-            CinemaDetailsViewModel? cinema = await this.cinemaService.GetCinemaDetailsByIdAsync(cinemaGuid);
+            CinemaProgramViewModel? viewModel = await this.cinemaService.GetCinemaProgramByIdAsync(id);
 
-            if (cinema == null)
-            {
-                return RedirectToAction(nameof(Manage));
-            }
-
-            return View(cinema); // Display the confirmation view
+            return this.View(viewModel);
         }
-
-        // POST: Cinema/SoftDelete/{id}
-        [HttpPost, ActionName("SoftDelete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> SoftDeleteConfirmed(string id)
-        {
-            if (!Guid.TryParse(id, out var cinemaGuid))
-            {
-                return RedirectToAction(nameof(Manage));
-            }
-
-            bool isSoftDeleted = await this.cinemaService.SoftDeleteCinemaAsync(cinemaGuid);
-
-            if (!isSoftDeleted)
-            {
-                // Display an error message if deletion was restricted
-                TempData["ErrorMessage"] = "Unable to delete cinema. It may have active movies associated with it.";
-                return RedirectToAction(nameof(SoftDelete), new { id = id });
-            }
-
-            return RedirectToAction(nameof(Manage));
-        }
-
     }
 }

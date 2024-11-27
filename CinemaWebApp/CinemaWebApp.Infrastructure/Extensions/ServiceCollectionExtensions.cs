@@ -1,6 +1,6 @@
 ﻿using CinemaWebApp.Data.Models;
 using CinemaWebApp.Data.Repository;
-using CinemaWebApp.Data.Repository.Contracts;
+using CinemaWebApp.Data.Repository.Interfaces;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
 

@@ -1,10 +1,11 @@
 ﻿namespace CinemaWebApp.Services.Data
 {
-    using CinemaWebApp.Data.Models;
-    using CinemaWebApp.Data.Repository.Contracts;
-    using CinemaWebApp.Services.Data.Contracts;
-    using Mapping;
     using Microsoft.EntityFrameworkCore;
+
+    using CinemaWebApp.Data.Models;
+    using CinemaWebApp.Data.Repository.Interfaces;
+    using Interfaces;
+    using Mapping;
     using Web.ViewModels.Cinema;
     using Web.ViewModels.Movie;
 
@@ -49,7 +50,6 @@
             {
                 viewModel = new CinemaDetailsViewModel()
                 {
-                    Id = cinema.Id, // Populate the Id here
                     Name = cinema.Name,
                     Location = cinema.Location,
                     Movies = cinema.CinemaMovies
@@ -66,63 +66,59 @@
             return viewModel;
         }
 
-
-        public async Task<EditCinemaFormModel?> GetCinemaEditModelByIdAsync(Guid id)
+        public async Task<EditCinemaFormModel?> GetCinemaForEditByIdAsync(Guid id)
         {
-            var cinema = await this.cinemaRepository
+            EditCinemaFormModel? cinemaModel = await this.cinemaRepository
                 .GetAllAttached()
-                .Where(c => c.Id == id)
-                .Select(c => new EditCinemaFormModel
-                {
-                    Name = c.Name,
-                    Location = c.Location
-                })
-                .FirstOrDefaultAsync();
+                .To<EditCinemaFormModel>()
+                .FirstOrDefaultAsync(c => c.Id.ToLower() == id.ToString().ToLower());
 
-            return cinema;
+            return cinemaModel;
         }
 
-        public async Task<bool> UpdateCinemaAsync(EditCinemaFormModel model)
+        public async Task<bool> EditCinemaAsync(EditCinemaFormModel model)
+        {
+            Cinema cinemaEntity = AutoMapperConfig.MapperInstance
+                .Map<EditCinemaFormModel, Cinema>(model);
+
+            bool result = await this.cinemaRepository.UpdateAsync(cinemaEntity);
+            return result;
+        }
+
+        public async Task<CinemaProgramViewModel?> GetCinemaProgramByIdAsync(Guid id)
         {
             Cinema? cinema = await this.cinemaRepository
                 .GetAllAttached()
-                .FirstOrDefaultAsync(c => c.Id.ToString() == model.Id);
-
-            if (cinema == null)
-            {
-                return false;
-            }
-
-            cinema.Name = model.Name;
-            cinema.Location = model.Location;
-
-            await this.cinemaRepository.UpdateAsync(cinema);
-
-            return true;
-        }
-
-        public async Task<bool> SoftDeleteCinemaAsync(Guid id)
-        {
-            var cinema = await this.cinemaRepository.GetAllAttached()
                 .Include(c => c.CinemaMovies)
+                .ThenInclude(cm => cm.Movie)
                 .FirstOrDefaultAsync(c => c.Id == id);
 
-            if (cinema == null)
+            CinemaProgramViewModel? viewModel = null;
+            if (cinema != null)
             {
-                return false;
+                viewModel = new CinemaProgramViewModel()
+                {
+                    Id = cinema.Id.ToString(),
+                    Name = cinema.Name,
+                    Location = cinema.Location,
+                    Movies = cinema.CinemaMovies
+                        .Where(cm => !cm.IsDeleted)
+                        .Select(cm => new MovieInCinemaViewModel
+                        {
+                            Id = cm.Movie.Id.ToString(),
+                            CinemaId = cm.CinemaId.ToString(),
+                            Title = cm.Movie.Title,
+                            Genre = cm.Movie.Genre,
+                            Duration = $"{cm.Movie.Duration} min",
+                            Description = cm.Movie.Description,
+                            AvailableTickets = cm.AvailableTickets
+                        })
+                        .ToList()
+                };
             }
 
-            bool hasActiveMovies = cinema.CinemaMovies.Any(cm => !cm.IsDeleted);
-            if (hasActiveMovies)
-            {
-                return false; // Restriction: cinema has active movies
-            }
-
-            cinema.IsDeleted = true;
-
-            await this.cinemaRepository.UpdateAsync(cinema);
-
-            return true;
+            return viewModel;
         }
+
     }
 }

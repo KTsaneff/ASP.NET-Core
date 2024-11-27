@@ -1,28 +1,28 @@
 ﻿namespace CinemaWebApp.Web.Controllers
 {
-    using CinemaWebApp.Controllers;
-    using CinemaWebApp.Data.Models;
-    using CinemaWebApp.Models.Data;
-    using CinemaWebApp.Services.Data.Contracts;
-    using CinemaWebApp.Web.ViewModels.Watchlist;
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Identity;
     using Microsoft.AspNetCore.Mvc;
-    using Microsoft.EntityFrameworkCore;
+
+    using Data.Models;
+    using Services.Data.Interfaces;
+    using System.Collections.Generic;
+    using ViewModels.Watchlist;
+
+    using static Common.ErrorMessages.Watchlist;
+    using CinemaWebApp.Controllers;
 
     [Authorize]
     public class WatchlistController : BaseController
     {
         private readonly IWatchlistService watchlistService;
-        private readonly AppDbContext dbContext;
         private readonly UserManager<ApplicationUser> userManager;
 
-        public WatchlistController(IWatchlistService watchlistService, 
-                                   AppDbContext dbContext, 
-                                   UserManager<ApplicationUser> userManager)
+        public WatchlistController(IWatchlistService watchlistService,
+            IManagerService managerService, UserManager<ApplicationUser> userManager)
+            : base(managerService)
         {
             this.watchlistService = watchlistService;
-            this.dbContext = dbContext;
             this.userManager = userManager;
         }
 
@@ -30,50 +30,33 @@
         public async Task<IActionResult> Index()
         {
             string userId = this.userManager.GetUserId(User)!;
-
-            if(string.IsNullOrWhiteSpace(userId))
+            if (String.IsNullOrWhiteSpace(userId))
             {
                 return this.RedirectToPage("/Identity/Account/Login");
             }
 
-           IEnumerable<ApplicationUserWatchlistViewModel> watchlist = await this.watchlistService.GetUserWatchlistByUserIdAsync(userId);
+            IEnumerable<ApplicationUserWatchlistViewModel> watchList =
+                await this.watchlistService
+                    .GetUserWatchListByUserIdAsync(userId);
 
-            return View(watchlist);
+            return View(watchList);
         }
 
         [HttpPost]
         public async Task<IActionResult> AddToWatchlist(string? movieId)
         {
-            Guid movieGuid = Guid.Empty;
-            if (!this.IsGuidValid(movieId, ref movieGuid))
+            string userId = this.userManager.GetUserId(User)!;
+            if (String.IsNullOrWhiteSpace(userId))
             {
-                return this.RedirectToAction("Index", "Movie");
+                return this.RedirectToPage("/Identity/Account/Login");
             }
 
-            Movie? movie = await this.dbContext
-                .Movies
-                .FirstOrDefaultAsync(m => m.Id == movieGuid);
-            if (movie == null)
+            bool result = await this.watchlistService
+                .AddMovieToUserWatchListAsync(movieId, userId);
+            if (result == false)
             {
+                TempData[nameof(AddToWatchListNotSuccessfullMessage)] = AddToWatchListNotSuccessfullMessage;
                 return this.RedirectToAction("Index", "Movie");
-            }
-
-            Guid userGuid = Guid.Parse(this.userManager.GetUserId(this.User)!);
-
-            bool addedToWatchlistAlready = await this.dbContext
-                .UsersMovies
-                .AnyAsync(um => um.ApplicationUserId == userGuid &&
-                                um.MovieId == movieGuid);
-            if (!addedToWatchlistAlready)
-            {
-                ApplicationUserMovie newUserMovie = new ApplicationUserMovie()
-                {
-                    ApplicationUserId = userGuid,
-                    MovieId = movieGuid
-                };
-
-                await this.dbContext.UsersMovies.AddAsync(newUserMovie);
-                await this.dbContext.SaveChangesAsync();
             }
 
             return this.RedirectToAction(nameof(Index));
@@ -82,30 +65,18 @@
         [HttpPost]
         public async Task<IActionResult> RemoveFromWatchlist(string? movieId)
         {
-            Guid movieGuid = Guid.Empty;
-            if (!this.IsGuidValid(movieId, ref movieGuid))
+            string userId = this.userManager.GetUserId(User)!;
+            if (String.IsNullOrWhiteSpace(userId))
             {
-                return this.RedirectToAction("Index", "Movie");
+                return this.RedirectToPage("/Identity/Account/Login");
             }
 
-            Movie? movie = await this.dbContext
-                .Movies
-                .FirstOrDefaultAsync(m => m.Id == movieGuid);
-            if (movie == null)
+            bool result = await this.watchlistService
+                .RemoveMovieFromUserWatchListAsync(movieId, userId);
+            if (result == false)
             {
+                // TODO: Implement a way to transfer the Error Message to the View
                 return this.RedirectToAction("Index", "Movie");
-            }
-
-            Guid userGuid = Guid.Parse(this.userManager.GetUserId(this.User)!);
-
-            ApplicationUserMovie? applicationUserMovie = await this.dbContext
-                .UsersMovies
-                .FirstOrDefaultAsync(um => um.ApplicationUserId == userGuid &&
-                                um.MovieId == movieGuid);
-            if (applicationUserMovie != null)
-            {
-                this.dbContext.UsersMovies.Remove(applicationUserMovie);
-                await this.dbContext.SaveChangesAsync();
             }
 
             return this.RedirectToAction(nameof(Index));

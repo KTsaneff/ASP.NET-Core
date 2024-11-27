@@ -2,7 +2,7 @@
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
-namespace CinemaApp.Data.Configuration
+namespace CinemaWebApp.Data.Configuration
 {
     public class CinemaMovieConfiguration : IEntityTypeConfiguration<CinemaMovie>
     {

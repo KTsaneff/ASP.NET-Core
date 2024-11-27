@@ -110,7 +110,9 @@ namespace CinemaWebApp.Data.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<bool>("IsDeleted")
-                        .HasColumnType("bit");
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("bit")
+                        .HasDefaultValue(false);
 
                     b.Property<string>("Location")
                         .IsRequired()
@@ -129,21 +131,21 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("95045fcd-c01c-4253-b128-348a4e7386c2"),
+                            Id = new Guid("c425be8f-43c0-44a3-bc1d-be3bf866a63c"),
                             IsDeleted = false,
                             Location = "Sofia",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("00603667-29d7-4f3a-a779-37e189ac4227"),
+                            Id = new Guid("8ab00abb-1b3e-4522-9c12-448c52c8a0a7"),
                             IsDeleted = false,
                             Location = "Plovdiv",
                             Name = "Cinema city"
                         },
                         new
                         {
-                            Id = new Guid("e49870ab-df14-4c23-9e11-6debb4134872"),
+                            Id = new Guid("d181ca8e-7507-4bbf-9ac8-a9b7f19fec3b"),
                             IsDeleted = false,
                             Location = "Varna",
                             Name = "Cinemax"
@@ -158,6 +160,9 @@ namespace CinemaWebApp.Data.Migrations
                     b.Property<Guid>("MovieId")
                         .HasColumnType("uniqueidentifier");
 
+                    b.Property<int>("AvailableTickets")
+                        .HasColumnType("int");
+
                     b.Property<bool>("IsDeleted")
                         .HasColumnType("bit");
 
@@ -166,6 +171,28 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasIndex("MovieId");
 
                     b.ToTable("CinemasMovies");
+                });
+
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Manager", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("WorkPhoneNumber")
+                        .IsRequired()
+                        .HasMaxLength(15)
+                        .HasColumnType("nvarchar(15)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique();
+
+                    b.ToTable("Managers");
                 });
 
             modelBuilder.Entity("CinemaWebApp.Data.Models.Movie", b =>
@@ -216,7 +243,7 @@ namespace CinemaWebApp.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = new Guid("6a14ba31-c193-40c3-a520-525f82a88d9b"),
+                            Id = new Guid("d0ecc65a-2406-4e73-9639-9761257790cd"),
                             Description = "Harry Potter and the Goblet of Fire is a 2005 fantasy film directed by Mike Newell from a screenplay by Steve Kloves. It is based on the 2000 novel Harry Potter and the Goblet of Fire by J. K. Rowling.",
                             Director = "Mike Newel",
                             Duration = 157,
@@ -227,7 +254,7 @@ namespace CinemaWebApp.Data.Migrations
                         },
                         new
                         {
-                            Id = new Guid("dfdcf1bf-0d1f-45ea-809b-fcc58a0f56a5"),
+                            Id = new Guid("34bbff1f-606c-4c4c-80da-3de8b649124d"),
                             Description = "The Lord of the Rings: The Fellowship of the Ring is a 2001 epic high fantasy adventure film directed by Peter Jackson from a screenplay by Fran Walsh, Philippa Boyens, and Jackson, based on 1954's The Fellowship of the Ring, the first volume of the novel The Lord of the Rings by J. R. R. Tolkien. ",
                             Director = "Peter Jackson",
                             Duration = 178,
@@ -435,6 +462,17 @@ namespace CinemaWebApp.Data.Migrations
                     b.Navigation("Cinema");
 
                     b.Navigation("Movie");
+                });
+
+            modelBuilder.Entity("CinemaWebApp.Data.Models.Manager", b =>
+                {
+                    b.HasOne("CinemaWebApp.Data.Models.ApplicationUser", "User")
+                        .WithOne()
+                        .HasForeignKey("CinemaWebApp.Data.Models.Manager", "UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("CinemaWebApp.Models.Ticket", b =>

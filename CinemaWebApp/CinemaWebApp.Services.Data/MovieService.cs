@@ -1,8 +1,8 @@
 ﻿namespace CinemaWebApp.Services.Data
 {
     using CinemaWebApp.Data.Models;
-    using CinemaWebApp.Data.Repository.Contracts;
-    using CinemaWebApp.Services.Data.Contracts;
+    using CinemaWebApp.Data.Repository.Interfaces;
+    using CinemaWebApp.Services.Data.Interfaces;
     using Mapping;
     using Microsoft.EntityFrameworkCore;
     using System.Globalization;

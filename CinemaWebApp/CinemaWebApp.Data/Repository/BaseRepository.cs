@@ -1,4 +1,4 @@
-﻿using CinemaWebApp.Data.Repository.Contracts;
+﻿using CinemaWebApp.Data.Repository.Interfaces;
 using CinemaWebApp.Models.Data;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;

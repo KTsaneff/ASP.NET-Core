@@ -1,12 +1,12 @@
-namespace CinemaApp.Web
+namespace CinemaWebApp.Web
 {
     using CinemaWebApp.Data.Models;
-    using CinemaWebApp.Data.Repository.Contracts;
+    using CinemaWebApp.Data.Repository.Interfaces;
     using CinemaWebApp.Data.Repository;
     using CinemaWebApp.Infrastructure.Extensions;
     using CinemaWebApp.Models.Data;
     using CinemaWebApp.Services.Data;
-    using CinemaWebApp.Services.Data.Contracts;
+    using CinemaWebApp.Services.Data.Interfaces;
     using CinemaWebApp.Services.Mapping;
     using CinemaWebApp.ViewModels.Error;
     using Microsoft.AspNetCore.Identity;
