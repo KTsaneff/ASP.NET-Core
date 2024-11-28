@@ -1,4 +1,4 @@
-﻿namespace DeskMarket.Models
+namespace DeskMarket.Models
 {
     public class ErrorViewModel
     {
