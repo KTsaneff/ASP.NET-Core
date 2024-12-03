@@ -1,0 +1,32 @@
+﻿@using CinemaApp.Web.ViewModels.Cinema
+@model IEnumerable<CinemaIndexViewModel>
+
+@{
+    ViewData["Title"] = "Cinemas";
+}
+
+<h2 class="my-4 text-center">Cinemas</h2>
+
+<table class="table table-hover table-bordered">
+    <thead class="table-dark">
+        <tr>
+            <th scope="col">Name</th>
+            <th scope="col">Location</th>
+            <th scope="col" class="text-center">Program</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var cinema in Model)
+        {
+            <tr>
+                <td>@cinema.Name</td>
+                <td>@cinema.Location</td>
+                <td class="text-center">
+                    <a asp-controller="Cinema" asp-action="ViewProgram" asp-route-id="@cinema.Id" class="btn btn-info btn-sm">
+                        <i class="bi bi-eye"></i> View Program
+                    </a>
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>

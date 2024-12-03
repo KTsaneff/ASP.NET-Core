@@ -1,0 +1,39 @@
+﻿@model IEnumerable<CinemaApp.Web.ViewModels.Cinema.CinemaIndexViewModel>
+
+@{
+    ViewData["Title"] = "Manage Tickets";
+}
+
+<h2 class="my-4 text-center">Manage Tickets</h2>
+
+<div class="container mt-4">
+    @if (Model.Any())
+    {
+        <div class="row">
+            @foreach (var cinema in Model)
+            {
+                <div class="col-md-4 mb-4">
+                    <div class="card h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">@cinema.Name</h5>
+                            <p class="card-text"><strong>Location:</strong> @cinema.Location</p>
+                        </div>
+                        <div class="card-footer text-center">
+                            <button type="button" class="btn btn-primary btn-sm" onclick="openManageTicketsModal('@cinema.Id')">
+                                <i class="bi bi-ticket-perforated"></i> Manage Tickets
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center">No cinemas available for ticket management.</p>
+    }
+</div>
+
+<div id="manageTicketsModalContainer"></div>
+
+<script src="~/js/manageTickets.js"></script>

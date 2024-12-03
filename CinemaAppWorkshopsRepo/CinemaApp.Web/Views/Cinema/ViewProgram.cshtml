@@ -1,0 +1,51 @@
+﻿@model CinemaApp.Web.ViewModels.Cinema.CinemaProgramViewModel
+
+@{
+    ViewData["Title"] = "Cinema Program";
+}
+
+<h2 class="my-4 text-center display-4">Cinema Program - @Model.Name</h2>
+<p class="text-center lead"><strong>Location:</strong> @Model.Location</p>
+
+<div class="container mt-5">
+    @if (Model.Movies.Any())
+    {
+        <div class="row">
+            @foreach (var movie in Model.Movies)
+            {
+                <div class="col-lg-4 col-md-6 mb-4">
+                    <div class="card h-100 shadow-sm border-0">
+                        <div class="card-body d-flex flex-column">
+                            <h5 class="card-title text-center font-weight-bold">@movie.Title</h5>
+                            <p class="card-text text-muted text-center"><em>@movie.Genre</em></p>
+                            <p class="card-text"><strong>Duration:</strong> @movie.Duration</p>
+                            <p class="card-text text-justify" style="font-size: 0.9rem;">@movie.Description</p>
+                        </div>
+                        <div class="card-footer bg-transparent text-center">
+                            <a href="javascript:void(0)"
+                               class="btn btn-success btn-sm w-75 buy-ticket-btn"
+                               data-cinema-id="@Model.Id"
+                               data-movie-id="@movie.Id">
+                                <i class="bi bi-ticket-perforated-fill"></i> Buy Ticket
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+    else
+    {
+        <p class="text-center text-muted">There are no movies scheduled for this cinema currently.</p>
+    }
+</div>
+
+<div class="text-center mt-5">
+    <a asp-action="Index" class="btn btn-secondary btn-lg px-4">
+        <i class="bi bi-arrow-left-circle"></i> Back to Cinemas
+    </a>
+</div>
+
+@await Html.PartialAsync("~/Views/Ticket/_BuyTicketModal.cshtml")
+
+
