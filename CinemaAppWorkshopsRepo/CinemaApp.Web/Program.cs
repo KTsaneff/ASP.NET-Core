@@ -17,6 +17,7 @@ namespace CinemaApp.Web
         {
             WebApplicationBuilder builder = WebApplication.CreateBuilder(args);
             string connectionString = builder.Configuration.GetConnectionString("SQLServer")!;
+            string jsonFilePath = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SeedingData", "movies.json");
 
             builder.Services
                 .AddDbContext<CinemaDbContext>(options =>
@@ -56,6 +57,7 @@ namespace CinemaApp.Web
 
                 DatabaseSeeder.SeedRoles(services);
                 DatabaseSeeder.AssignAdminRole(services);
+                DatabaseSeeder.ImportMovies(services, jsonFilePath);
             }
 
             AutoMapperConfig.RegisterMappings(typeof(ErrorViewModel).Assembly);

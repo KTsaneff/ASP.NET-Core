@@ -62,6 +62,8 @@
 
         public IQueryable<TType> GetAllAttached()
         {
+            var tempType = typeof(TType).Name;
+            var testManagers = this.dbSet.ToList();
             return this.dbSet.AsQueryable();
         }
 

@@ -2,7 +2,7 @@
 {
     using Microsoft.AspNetCore.Authorization;
     using Microsoft.AspNetCore.Mvc;
-    
+
     using Services.Data.Interfaces;
     using ViewModels.Cinema;
 
@@ -19,6 +19,12 @@
         [HttpGet]
         public async Task<IActionResult> Index()
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (isManager)
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
             IEnumerable<CinemaIndexViewModel> cinemas =
                 await this.cinemaService.IndexGetAllOrderedByLocationAsync();
 
@@ -26,43 +32,14 @@
         }
 
         [HttpGet]
-        [Authorize]
-#pragma warning disable CS1998
-        public async Task<IActionResult> Create()
-#pragma warning restore CS1998
-        {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
-            return this.View();
-        }
-
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create(AddCinemaFormModel model)
-        {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                return this.View(model);
-            }
-
-            await this.cinemaService.AddCinemaAsync(model);
-
-            return this.RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Details(string? id)
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (isManager)
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
             Guid cinemaGuid = Guid.Empty;
             bool isIdValid = this.IsGuidValid(id, ref cinemaGuid);
             if (!isIdValid)
@@ -73,7 +50,6 @@
             CinemaDetailsViewModel? viewModel = await this.cinemaService
                 .GetCinemaDetailsByIdAsync(cinemaGuid);
 
-            // Invalid(non-existing) GUID in the URL
             if (viewModel == null)
             {
                 return this.RedirectToAction(nameof(Index));
@@ -84,14 +60,23 @@
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Manage()
+        public async Task<IActionResult> ViewProgram(Guid id)
         {
             bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
+            if (isManager)
             {
-                return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Manage));
             }
 
+            CinemaProgramViewModel? viewModel = await this.cinemaService.GetCinemaProgramByIdAsync(id);
+
+            return this.View(viewModel);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Manage()
+        {
             IEnumerable<CinemaIndexViewModel> cinemas =
                 await this.cinemaService.IndexGetAllOrderedByLocationAsync();
 
@@ -99,21 +84,35 @@
         }
 
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> Edit(string? id)
+        [Authorize(Roles = "Manager")]
+        public IActionResult Create()
         {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
+            return this.View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Create(AddCinemaFormModel model)
+        {
+            if (!this.ModelState.IsValid)
             {
-                // TODO: Implement notifications for error and warning messages!
-                return this.RedirectToAction(nameof(Index));
+                return this.View(model);
             }
 
+            await this.cinemaService.AddCinemaAsync(model);
+
+            return this.RedirectToAction(nameof(Manage));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Edit(string? id)
+        {
             Guid cinemaGuid = Guid.Empty;
             bool isIdValid = this.IsGuidValid(id, ref cinemaGuid);
             if (!isIdValid)
             {
-                return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Manage));
             }
 
             EditCinemaFormModel? formModel = await this.cinemaService
@@ -123,15 +122,9 @@
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> Edit(EditCinemaFormModel formModel)
         {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
             if (!ModelState.IsValid)
             {
                 return this.View(formModel);
@@ -145,22 +138,7 @@
                 return this.View(formModel);
             }
 
-            return this.RedirectToAction(nameof(Details), "Cinema", new { id = formModel.Id });
-        }
-
-        [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> ViewProgram(Guid id)
-        {
-           bool isManager = await this.IsUserManagerAsync();
-            if (isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
-            CinemaProgramViewModel? viewModel = await this.cinemaService.GetCinemaProgramByIdAsync(id);
-
-            return this.View(viewModel);
+            return this.RedirectToAction(nameof(Manage));
         }
     }
 }

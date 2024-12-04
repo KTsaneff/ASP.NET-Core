@@ -157,5 +157,20 @@
 
             return true;
         }
+
+        public async Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(string? searchQuery = null)
+        {
+            IQueryable<Movie> movies = this.movieRepository
+                .GetAllAttached();
+            if (!string.IsNullOrWhiteSpace(searchQuery))
+            {
+                searchQuery = searchQuery.ToLower().Trim();
+                movies = movies
+                    .Where(m => m.Title.ToLower().Contains(searchQuery));
+            }
+            return await movies
+                .To<AllMoviesIndexViewModel>()
+                .ToListAsync();
+        }
     }
 }

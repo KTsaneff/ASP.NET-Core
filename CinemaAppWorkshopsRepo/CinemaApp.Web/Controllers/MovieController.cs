@@ -2,7 +2,6 @@
 {
     using Microsoft.AspNetCore.Mvc;
     using Microsoft.AspNetCore.Authorization;
-    
     using Services.Data.Interfaces;
     using ViewModels.Movie;
 
@@ -19,26 +18,19 @@
         }
 
         [HttpGet]
-        public async Task<IActionResult> Index()
-        {
-            IEnumerable<AllMoviesIndexViewModel> allMovies =
-                await this.movieService.GetAllMoviesAsync();
-
-            return this.View(allMovies);
-        }
-
-        [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Manage()
+        public async Task<IActionResult> Index(string? searchQuery = null)
         {
             bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
+            if (isManager)
             {
-                return this.RedirectToAction(nameof(Index));
+                return this.RedirectToAction(nameof(Manage));
             }
 
             IEnumerable<AllMoviesIndexViewModel> allMovies =
-                await this.movieService.GetAllMoviesAsync();
+                await this.movieService.GetAllMoviesAsync(searchQuery);
+
+            ViewData["SearchQuery"] = searchQuery;
 
             return this.View(allMovies);
         }
@@ -46,54 +38,18 @@
 
         [HttpGet]
         [Authorize]
-#pragma warning disable CS1998
-        public async Task<IActionResult> Create()
-#pragma warning restore CS1998
-        {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
-            return this.View();
-        }
-
-        [HttpPost]
-        [Authorize]
-        public async Task<IActionResult> Create(AddMovieInputModel inputModel)
-        {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
-            if (!this.ModelState.IsValid)
-            {
-                // Render the same form with user entered values + model errors 
-                return this.View(inputModel);
-            }
-
-            bool result = await this.movieService.AddMovieAsync(inputModel);
-            if (result == false)
-            {
-                this.ModelState.AddModelError(nameof(inputModel.ReleaseDate),
-                    String.Format("The Release Date must be in the following format: {0}", ReleaseDateFormat));
-                return this.View(inputModel);
-            }
-
-            return this.RedirectToAction(nameof(Index));
-        }
-
-        [HttpGet]
         public async Task<IActionResult> Details(string? id)
         {
+            bool isManager = await this.IsUserManagerAsync();
+            if (isManager)
+            {
+                return this.RedirectToAction(nameof(Manage));
+            }
+
             Guid movieGuid = Guid.Empty;
             bool isGuidValid = this.IsGuidValid(id, ref movieGuid);
             if (!isGuidValid)
             {
-                // Invalid id format
                 return this.RedirectToAction(nameof(Index));
             }
 
@@ -101,7 +57,6 @@
                 .GetMovieDetailsByIdAsync(movieGuid);
             if (movie == null)
             {
-                // Non-existing movie guid
                 return this.RedirectToAction(nameof(Index));
             }
 
@@ -109,15 +64,46 @@
         }
 
         [HttpGet]
-        [Authorize]
-        public async Task<IActionResult> AddToProgram(string? id)
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Manage()
         {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
+            IEnumerable<AllMoviesIndexViewModel> allMovies =
+                await this.movieService.GetAllMoviesAsync();
+
+            return this.View(allMovies);
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public IActionResult Create()
+        {
+            return this.View();
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> Create(AddMovieInputModel inputModel)
+        {
+            if (!this.ModelState.IsValid)
             {
-                return this.RedirectToAction(nameof(Index));
+                return this.View(inputModel);
             }
 
+            bool result = await this.movieService.AddMovieAsync(inputModel);
+            if (!result)
+            {
+                this.ModelState.AddModelError(nameof(inputModel.ReleaseDate),
+                    String.Format("The Release Date must be in the following format: {0}", ReleaseDateFormat));
+                return this.View(inputModel);
+            }
+
+            return this.RedirectToAction(nameof(Manage));
+        }
+
+        [HttpGet]
+        [Authorize(Roles = "Manager")]
+        public async Task<IActionResult> AddToProgram(string? id)
+        {
             Guid movieGuid = Guid.Empty;
             bool isGuidValid = this.IsGuidValid(id, ref movieGuid);
             if (!isGuidValid)
@@ -136,15 +122,9 @@
         }
 
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles = "Manager")]
         public async Task<IActionResult> AddToProgram(AddMovieToCinemaInputModel model)
         {
-            bool isManager = await this.IsUserManagerAsync();
-            if (!isManager)
-            {
-                return this.RedirectToAction(nameof(Index));
-            }
-
             if (!this.ModelState.IsValid)
             {
                 return this.View(model);
@@ -159,12 +139,12 @@
 
             bool result = await this.movieService
                 .AddMovieToCinemasAsync(movieGuid, model);
-            if (result == false)
+            if (!result)
             {
                 return this.RedirectToAction(nameof(Index));
             }
 
-            return this.RedirectToAction(nameof(Index), "Cinema");
+            return this.RedirectToAction(nameof(Manage));
         }
     }
 }

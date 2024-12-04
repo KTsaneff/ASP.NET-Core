@@ -20,4 +20,10 @@
     <ProjectReference Include="..\CinemaApp.Data.Models\CinemaApp.Data.Models.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <None Update="SeedingData\movies.json">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
 </Project>

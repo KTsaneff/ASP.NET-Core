@@ -12,6 +12,8 @@
 
         public string Genre { get; set; } = null!;
 
+        public string? ImageUrl { get; set; }
+
         public string ReleaseDate { get; set; } = null!;
 
         public string Director { get; set; } = null!;
@@ -22,7 +24,9 @@
         {
             configuration.CreateMap<Movie, AllMoviesIndexViewModel>()
                 .ForMember(d => d.ReleaseDate,
-                    x => x.MapFrom(s => s.ReleaseDate.ToString("MMMM yyyy")));
+                    x => x.MapFrom(s => s.ReleaseDate.ToString("MMMM yyyy")))
+                .ForMember(d => d.ImageUrl,
+                x => x.MapFrom(s => s.ImageUrl));
         }
     }
 }

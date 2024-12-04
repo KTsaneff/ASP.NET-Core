@@ -1,6 +1,7 @@
 ﻿using CinemaApp.Data.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.DependencyInjection;
+using System.Text.Json;
 
 namespace CinemaApp.Data.Configuration
 {
@@ -59,5 +60,33 @@ namespace CinemaApp.Data.Configuration
             }
         }
 
+        public static void ImportMovies(IServiceProvider serviceProvider, string jsonFilePath)
+        {
+            CinemaDbContext cinemaDbContext = serviceProvider.GetRequiredService<CinemaDbContext>();
+
+            if (cinemaDbContext.Movies.Any())
+            {
+                return;
+            }
+
+            try
+            {
+                var jsonData = File.ReadAllText(jsonFilePath);
+                var movies = JsonSerializer.Deserialize<List<Movie>>(jsonData);
+
+                if (movies == null || !movies.Any())
+                {
+                    throw new Exception("No movies found in the JSON file.");
+                }
+
+                cinemaDbContext.Movies.AddRange(movies);
+                cinemaDbContext.SaveChanges();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Error importing movies: {ex.Message}");
+                throw;
+            }
+        }
     }
 }

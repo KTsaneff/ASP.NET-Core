@@ -13,5 +13,7 @@
         Task<AddMovieToCinemaInputModel?> GetAddMovieToCinemaInputModelByIdAsync(Guid id);
 
         Task<bool> AddMovieToCinemasAsync(Guid movieId, AddMovieToCinemaInputModel model);
+
+        Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(string? searchQuery = null);
     }
 }
