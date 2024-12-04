@@ -1,7 +1,7 @@
-﻿namespace CinemaApp.Data.Models
-{
-    using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 
+namespace CinemaApp.Data.Models
+{
     public class ApplicationUser : IdentityUser<Guid>
     {
         public ApplicationUser()

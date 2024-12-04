@@ -75,7 +75,6 @@ namespace CinemaApp.Web
 
             app.Use((context, next) =>
             {
-                // Middleware to redirect Admins
                 if (context.User.Identity?.IsAuthenticated == true && context.Request.Path == "/")
                 {
                     if (context.User.IsInRole("Admin"))
