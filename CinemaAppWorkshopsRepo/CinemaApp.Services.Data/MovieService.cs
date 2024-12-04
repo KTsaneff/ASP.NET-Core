@@ -158,19 +158,34 @@
             return true;
         }
 
-        public async Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(string? searchQuery = null)
+        public async Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(
+            string? searchQuery = null,
+            string? genre = null,
+            int? releaseYear = null)
         {
-            IQueryable<Movie> movies = this.movieRepository
-                .GetAllAttached();
+            IQueryable<Movie> movies = this.movieRepository.GetAllAttached();
+
             if (!string.IsNullOrWhiteSpace(searchQuery))
             {
                 searchQuery = searchQuery.ToLower().Trim();
-                movies = movies
-                    .Where(m => m.Title.ToLower().Contains(searchQuery));
+                movies = movies.Where(m => m.Title.ToLower().Contains(searchQuery));
             }
+
+            if (!string.IsNullOrWhiteSpace(genre))
+            {
+                genre = genre.ToLower().Trim();
+                movies = movies.Where(m => m.Genre.ToLower() == genre);
+            }
+
+            if (releaseYear.HasValue)
+            {
+                movies = movies.Where(m => m.ReleaseDate.Year == releaseYear.Value);
+            }
+
             return await movies
                 .To<AllMoviesIndexViewModel>()
                 .ToListAsync();
         }
+
     }
 }
