@@ -19,7 +19,7 @@
 
         [HttpGet]
         [Authorize]
-        public async Task<IActionResult> Index(string? searchQuery = null, string? genre = null, int? releaseYear = null)
+        public async Task<IActionResult> Index(string? searchQuery = null, string? genre = null, int? releaseYear = null, int pageNumber = 1)
         {
             bool isManager = await this.IsUserManagerAsync();
             if (isManager)
@@ -27,15 +27,18 @@
                 return this.RedirectToAction(nameof(Manage));
             }
 
-            IEnumerable<AllMoviesIndexViewModel> allMovies =
-                await this.movieService.GetAllMoviesAsync(searchQuery, genre, releaseYear);
+            (IEnumerable<AllMoviesIndexViewModel> movies, int totalPages) =
+                await this.movieService.GetAllMoviesAsync(searchQuery, genre, releaseYear, pageNumber);
 
             ViewData["SearchQuery"] = searchQuery;
             ViewData["Genre"] = genre;
             ViewData["ReleaseYear"] = releaseYear;
+            ViewData["CurrentPage"] = pageNumber;
+            ViewData["TotalPages"] = totalPages;
 
-            return this.View(allMovies);
+            return this.View(movies);
         }
+
 
 
 

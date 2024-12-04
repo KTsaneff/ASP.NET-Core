@@ -158,10 +158,12 @@
             return true;
         }
 
-        public async Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(
-            string? searchQuery = null,
-            string? genre = null,
-            int? releaseYear = null)
+        public async Task<(IEnumerable<AllMoviesIndexViewModel> Movies, int TotalPages)> GetAllMoviesAsync(
+            string? searchQuery = null, 
+            string? genre = null, 
+            int? releaseYear = null, 
+            int pageNumber = 1, 
+            int pageSize = 5)
         {
             IQueryable<Movie> movies = this.movieRepository.GetAllAttached();
 
@@ -182,10 +184,18 @@
                 movies = movies.Where(m => m.ReleaseDate.Year == releaseYear.Value);
             }
 
-            return await movies
+            int totalMovies = await movies.CountAsync();
+            int totalPages = (int)Math.Ceiling(totalMovies / (double)pageSize);
+
+            movies = movies
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize);
+
+            var moviesToReturn = await movies
                 .To<AllMoviesIndexViewModel>()
                 .ToListAsync();
-        }
 
+            return (moviesToReturn, totalPages);
+        }
     }
 }

@@ -44,7 +44,6 @@
     </div>
 </form>
 
-
 <table class="table table-striped">
     <thead>
         <tr>
@@ -104,3 +103,47 @@
         <a asp-action="Create" class="btn btn-primary">Add New Movie</a>
     }
 }
+
+<nav aria-label="Page navigation" class="mt-4">
+    <ul class="pagination">
+        @if ((int)ViewData["CurrentPage"] > 1)
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@( (int)ViewData["CurrentPage"] - 1 )"
+                   asp-route-searchQuery="@ViewData["SearchQuery"]"
+                   asp-route-genre="@ViewData["Genre"]"
+                   asp-route-releaseYear="@ViewData["ReleaseYear"]">
+                    Previous
+                </a>
+            </li>
+        }
+
+        @for (int i = 1; i <= (int)ViewData["TotalPages"]; i++)
+        {
+            <li class="page-item @(i == (int)ViewData["CurrentPage"] ? "active" : "")">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@i"
+                   asp-route-searchQuery="@ViewData["SearchQuery"]"
+                   asp-route-genre="@ViewData["Genre"]"
+                   asp-route-releaseYear="@ViewData["ReleaseYear"]">
+                    @i
+                </a>
+            </li>
+        }
+
+        @if ((int)ViewData["CurrentPage"] < (int)ViewData["TotalPages"])
+        {
+            <li class="page-item">
+                <a class="page-link" asp-action="Index"
+                   asp-route-pageNumber="@( (int)ViewData["CurrentPage"] + 1 )"
+                   asp-route-searchQuery="@ViewData["SearchQuery"]"
+                   asp-route-genre="@ViewData["Genre"]"
+                   asp-route-releaseYear="@ViewData["ReleaseYear"]">
+                    Next
+                </a>
+            </li>
+        }
+    </ul>
+</nav>
+

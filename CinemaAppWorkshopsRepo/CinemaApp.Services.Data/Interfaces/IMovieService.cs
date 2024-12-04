@@ -14,9 +14,10 @@
 
         Task<bool> AddMovieToCinemasAsync(Guid movieId, AddMovieToCinemaInputModel model);
 
-        Task<IEnumerable<AllMoviesIndexViewModel>> GetAllMoviesAsync(
-            string? searchQuery = null,
-            string? genre = null,
-            int? releaseYear = null);
+        Task<(IEnumerable<AllMoviesIndexViewModel> Movies, int TotalPages)> GetAllMoviesAsync(
+            string? searchQuery = null, 
+            string? genre = null, 
+            int? releaseYear = null, 
+            int pageNumber = 1, int pageSize = 5);
     }
 }
