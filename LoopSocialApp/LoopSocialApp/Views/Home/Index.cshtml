@@ -18,7 +18,7 @@
                             <li class="md:pr-3 pr-2 hover:scale-[1.15] hover:-rotate-2 duration-300">
                                 <a href="~/images/avatar/user.png">
                                     <div class="md:w-16 md:h-16 w-12 h-12 relative md:border-4 border-2 shadow border-white rounded-full overflow-hidden">
-                                        <img src="~/images/avatar/user.png"/>
+                                        <img src="~/images/avatar/user.png" />
                                     </div>
                                 </a>
                             </li>
@@ -44,13 +44,13 @@
                 </div>
             </div>
             <div class="md:max-w-[580px] mx-auto flex-1 xl:space-y-6 space-y-3">
-                <div class="bg-white rounded-xl shadow-sm md:p-4 p-2 space-y-4 text-sm font-medium border-1">
+                <div class="bg-white rounded-xl shadow-sm md:p-4 p-2 space-y-4 text-sm font-medium border1">
                     <div class="flex items-center md:gap-3 gap-1">
                         <div class="flex-1 bg-slate-100 hover:bg-opacity-80 transition-all ronded-lg cursor-pointer"
                              uk-toggle="target: #create-status">
                             <div class="py-2.5 text-center">What do you have in mind?</div>
                         </div>
-                        <div class="cursor-pointer hover:bg-opacity-80 p-1 px-1.5 rounded-xl transition-all bg-pink-100/60 hover:bg-pink-100" 
+                        <div class="cursor-pointer hover:bg-opacity-80 p-1 px-1.5 rounded-xl transition-all bg-pink-100/60 hover:bg-pink-100"
                              uk-toggle="target: #create-status">
                             <svg xmlns="http://www.w3.org/2000/svg" class="w-8 h-8 stroke-pink-600 fill-pink-200/70" viewBox="0 0 24 24" stroke-width="1.5" stroke="#2c3e50" fill="none" stroke-linecap="round" stroke-linejoin="round">
                                 <path stroke="none" d="M0 0h24v24H0z" fill="none" />
@@ -62,6 +62,97 @@
                         </div>
                     </div>
                 </div>
+
+                <div class="bg-white rounded-xl shadow-sm md:p-4 p-2 space-y-4 text=sm font-medium border1"
+                     style="width: 580px;">
+                    Currently, there are no posts vailable. Would you like to create the first one?
+                </div>
+
+                <div class="bg-white rounded-xl shadow-sm text-sm font-medium border1">
+
+                    @* Post Heading *@
+                    <div class="flex gap-3 sm:p-4 p-2.5 text-sm font-medium">
+                        <a>
+                            <img src="~/images/avatar/user.png" class="w-9 h-9 rounded-full" />
+                        </a>
+                        <div class="flex-1">
+                            <a>
+                                <h4 class="text-black">Krasimir Tsanev</h4>
+                                <div class="text-xs text-gray-500/80">1 day ago</div>
+                            </a>
+                        </div>
+                        <div class="-mr-1">
+                            <button type="button" class="button-icon w-8 h-8">
+                                <ion-icon class="text-xl" name="ellipsis-horizontal"></ion-icon>
+                            </button>
+                            <div class="w-[245px]" uk-dropdown="pos: bottom-right; animation: uk-animation-scale-up uk-transform-origin-top-right; animate-out: true; mode: click">
+                                <form>
+                                    <button type="submit" class="hover:!bg-red-50 icon-link">
+                                        <ion-icon class="text-xl shrink-0" name="flag-outline"></ion-icon> Report
+                                    </button>
+                                </form>
+                                <hr />
+                                <form>
+                                    <button type="submit" class="hover:!bg-red-50 icon-link">
+                                        <ion-icon class="text-xl" name="lock-closed-outline"></ion-icon> Set as private
+                                    </button>
+                                </form>
+                                <hr />
+                                <form>
+                                    <button type="submit" class="hover:!bg-red-50 icon-link">
+                                        <ion-icon class="text-xl" name="trash-bin-outline"></ion-icon> Delete post
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @* Post Content *@
+                    <a>
+                        <div class="sm:px-4 p-2.5 pt-0 w-full">
+                            <p class="font-normal">
+                                This is our first status from the #LoopSocialApp  where you can share text or pictures with your friends and family...
+                            </p>
+                        </div>
+                    </a>
+                    <a>
+                        <div class="relative w-full lg:h-96 h-full sm:px-4">
+                            <img src="~/images/placeholders/post-placeholder.jpg" class="sm:rounded-lg w-full h-full object-cover" />
+                        </div>
+                    </a>
+                    @* Icons *@
+                    <div class="sm:p-4 p-2.5 flex items-center gap-4 text-xs font-semibold">
+                        <div class="flex items-center gap-2.5">
+                            <a class="button-icon text-red-500 bg-red-100">
+                                <ion-icon class="text-lg" name="heart"></ion-icon>
+                            </a>
+                            <a href="#">24</a>
+                        </div>
+                        <div class="flex items-center gap-3">
+                            <a class="button-icon">
+                                <ion-icon class="text-lg" name="chatbubble-ellipses-outline"></ion-icon>
+                            </a>
+                            <a href="#">3</a>
+                        </div>
+
+                        <div class="ml-auto"></div>
+                        <div>
+                            <a class="button-icon ml-auto">
+                                <ion-icon class="text-lg" name="bookmark-outline"></ion-icon>
+                            </a>
+                        </div>
+                    </div>
+                    @* Add Comment Section *@
+                    <div>
+                        <div class="sm:px-4 sm:py-3 p-2 border-t border-gray-100 flex items-center gap-1">
+                            <img src="~/images/avatar/user.png" class="w-6 h-6 rounded-full"/>
+                            <div class="flex-1 relative overflow-hidden h-10">
+                                <textarea placeholder="Add Comment..." rows="1" class="w-full resize-none !bg-transparent px-4 py-2 focus:!border-transparent focus:!ring-transparent"></textarea>
+                            </div>  
+                            <button class="text-sm rounded-full py-1.5 px-3.5 bg-secondery">Comment</button>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </div>
         <div class="flex-1"></div>
