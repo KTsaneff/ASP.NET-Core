@@ -16,5 +16,9 @@ namespace LoopSocialApp.Data.DataModels
         public DateTime DateCreated { get; set; }
 
         public DateTime DateUpdated { get; set; }
+
+        public string ApplicationUserId { get; set; } = null!;
+
+        public virtual ApplicationUser ApplicationUser { get; set; } = null!;
     }
 }

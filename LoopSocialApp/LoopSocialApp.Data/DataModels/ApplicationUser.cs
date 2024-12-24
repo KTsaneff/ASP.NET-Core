@@ -12,5 +12,7 @@ namespace LoopSocialApp.Data.DataModels
         public string FullName { get; set; } = null!;
 
         public string? ProfileImageUrl { get; set; }
+
+        public virtual ICollection<Post> Posts { get; set; } = new List<Post>();
     }
 }
