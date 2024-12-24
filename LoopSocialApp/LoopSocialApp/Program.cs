@@ -1,3 +1,6 @@
+using LoopSocialApp.Data;
+using Microsoft.EntityFrameworkCore;
+
 namespace LoopSocialApp
 {
     public class Program
@@ -8,6 +11,15 @@ namespace LoopSocialApp
 
             // Add services to the container.
             builder.Services.AddControllersWithViews();
+
+            //Database Configuration
+            string? dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
+            if (dbConnectionString == null)
+            {
+                throw new InvalidOperationException("Connection string not found.");
+            }
+            builder.Services.AddDbContext<AppDbContext>(options => options
+            .UseSqlServer(dbConnectionString));
 
             var app = builder.Build();
 
