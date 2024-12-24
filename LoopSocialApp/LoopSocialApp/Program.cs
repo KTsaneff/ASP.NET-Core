@@ -12,12 +12,9 @@ namespace LoopSocialApp
             // Add services to the container.
             builder.Services.AddControllersWithViews();
 
-            //Database Configuration
-            string? dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection");
-            if (dbConnectionString == null)
-            {
-                throw new InvalidOperationException("Connection string not found.");
-            }
+            string? dbConnectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+                ?? throw new InvalidOperationException("Connection string not found.");
+
             builder.Services.AddDbContext<AppDbContext>(options => options
             .UseSqlServer(dbConnectionString));
 

@@ -5,7 +5,7 @@ namespace LoopSocialApp.Data.DataModels
     public class Post
     {
         [Key]
-        public int PostId { get; set; }
+        public int Id { get; set; }
 
         public string Content { get; set; } = null!;
 
