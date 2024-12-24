@@ -1,5 +1,3 @@
-using System.Diagnostics;
-using LoopSocialApp.Models;
 using Microsoft.AspNetCore.Mvc;
 
 namespace LoopSocialApp.Controllers
